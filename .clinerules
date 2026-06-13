@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════
+# L1 宪法层 — The Constitution
+# 智能体潜意识与绝对行为边界
+# ═══════════════════════════════════════════════════════════
+
+## 1. 核心定位
+
+本智能体运行于 **三层记忆架构** 之下，为 **Personal Knowledge Intelligence Agent（PKIA）** 提供全自动、有状态的研发支持。
+
+- **主仓库**：`DifyMind`（origin: https://github.com/piomeer/DifyMind.git）
+- **核心项目**：PKIA — 个人知识智能体
+- **底层平台**：Dify（LLM 应用开发平台）
+- **工作目录**：`/home/mahe/dify`
+
+## 2. 技术栈与架构锁死
+
+### 2.1 Dify 后端 (api/)
+- 语言：Python（Flask, 领域驱动设计）
+- 包管理：`uv run --project api`
+- 测试框架：pytest（Arrange-Act-Assert）
+- 代码规范：Ruff 格式化 + ruff linting（遵循 `.ruff.toml`）
+- 架构模式：控制器 → 服务 → 核心/领域 分层架构
+- ORM：SQLAlchemy（继承 `models.base.TypeBase`）
+- 异步任务：Celery + Redis Broker
+
+### 2.2 Dify 前端 (web/)
+- 框架：Next.js + TypeScript + React
+- 包管理：pnpm（工作空间根目录）
+- 测试框架：Vitest + React Testing Library
+- 代码规范：ESLint（`pnpm lint:fix` 优先）+ `pnpm type-check`
+- 覆盖组件：仅使用 `@langgenius/dify-ui/*` 覆盖原语
+- 国际化：所有用户可见字符串放入 `web/i18n/en-US/`
+
+### 2.3 PKIA (Personal Knowledge Intelligence Agent)
+- 构建于 Dify Platform 之上
+- 利用 Dify Workflow、RAG Pipeline、Agent 能力实现个人知识管理
+- 三层记忆系统作为状态管理基础设施
+
+## 3. 单机 WSL 开发协议
+
+| 项目 | 值 |
+|------|-----|
+| 开发环境 | WSL (Linux) |
+| 默认分支 | `main` |
+| 推送策略 | **禁止未经确认自动 push** — 所有推送前必须等待用户明确批准 |
+| 提交格式 | `<类型>: <描述>`（如 `feat: 添加PKIA核心模块`） |
+
+**规则**：
+- 所有开发在本地 WSL 完成
+- 不允许在无用户确认的情况下执行 `git push`
+- 仅允许本地 commit，推送需用户明确指令
+
+## 4. 数据库保护红线
+
+- **L2 图谱层文件**（`pkia-memory.json`）：绝对禁止使用普通文本编辑工具格式化、美化或手动编辑
+- **所有 L2 更新** 必须通过 MCP `memory` 服务器的工具（`create_entities`、`create_relations`、`add_observations`、`delete_entities` 等）进行
+- **L3 进度层**（`PROGRESS.md`）：使用标准 Markdown，可直接编辑
+
+## 5. 记忆流转强制协议 (Bouncer Protocol)
+
+结束任务时，必须执行以下三步：
+
+### Step 1: 准备 payload
+生成 `.memory_payload.json`，结构：
+```json
+{
+  "l1_reflection": "宪法执行情况与盲区反思",
+  "l2_graph_updates": [
+    {"type": "entity", "name": "...", "entityType": "...", "observations": [...]},
+    {"type": "relation", "from": "...", "to": "...", "relationType": "..."}
+  ],
+  "l3_progress_notes": "坑点、耗时、核心优化点沉淀",
+  "next_steps": "为下一个循环准备的指令",
+  "commit_message": "简明Git提交信息"
+}
+```
+
+### Step 2: 呼叫门禁脚本
+运行 `python utils/memory_bouncer.py`（Exit Code 0 表示成功）
+
+### Step 3: 验证与移交
+确认脚本返回 0 后，销毁 payload 文件，汇报任务闭环。
+
+## 6. 编码规范红线
+
+- 禁止使用 `print()` — 必须使用 `logger = logging.getLogger(__name__)`
+- 禁止直接读取环境变量 — 必须通过 `configs.dify_config`
+- 禁止使用 `Any` 类型 — 必须使用精确类型注解
+- 所有数据库查询必须携带 `tenant_id` 范围
+- 后台任务必须幂等，并记录关联对象标识符
