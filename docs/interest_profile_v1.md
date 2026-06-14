@@ -99,12 +99,19 @@ PKIA 的核心不是发现所有信息。
 - Agent Memory
 - Multi-Agent
 - AI Engineering
+- LLM Inference
+- LLM Serving
+- Inference Optimization
 
 原因：
 
 与职业目标直接相关。
 
 任何该领域的重要项目都应优先推荐。
+
+包含 LLM Inference、LLM Serving、Inference Optimization：
+
+与职业目标 #3 LLM Inference Optimization Engineer 直接相关。
 
 ---
 
