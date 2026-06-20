@@ -128,16 +128,7 @@ Ignore
 
 **Reasoning:**
 
-OpenManus 是社区热门开源 Agent Framework。
-
-特点：
-
-- Tool Use
-- Planning
-- Autonomous Execution
-- Agent Workflow
-
-近期在 Agent 社区获得大量关注。
+OpenManus 属于 Agent Framework，对应 Career Alignment 40 分（核心赛道）。Agent Framework 是 Agent Application Engineer（职业目标 #1）的日常工具，框架的技术架构和设计取舍直接影响开发效率和能力边界。OpenManus 作为 Meta 推出的 Agent 构建框架，强调 Tool-Use 与 Planning 的深度集成，与职业目标 #1（构建 Agent 应用）和 #4（Multi-Agent 系统）均有直接关联。该项目近期在 GitHub 上获得极高的关注度，Trend Heat 评分反映了社区认可度。兴趣画像中 Agent Framework 属于 S Tier，无需任何调和即可直接进入核心关注区。
 
 ---
 
