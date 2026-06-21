@@ -1,4 +1,5 @@
-# PKIA L2 Memory Ontology — 正式规范 v1.1
+ `
+ # PKIA L2 Memory Ontology — 正式规范 v1.1
 
 > **文档状态**: Architecture Freeze Document  
 > **所属系统**: Personal Knowledge Intelligence Agent (PKIA)  

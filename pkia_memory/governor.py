@@ -2,9 +2,11 @@
 pkia_memory.governor — Memory Governor: the central coordinator of L2 Memory OS.
 
 The Governor sits between the Agent (caller) and the MCP Memory Server
-(persistence layer).  It maintains in-memory Slot + Relation indexes so that
-all reads are served from memory (fast, no MCP calls), and writes are
-translated into MCP command payloads that the Agent executes.
+(ephemeral query layer).  It maintains in-memory Slot + Relation indexes
+so that all reads are served from memory (fast, no MCP calls).
+
+Persistence is handled by writing directly to ``pkia-memory.json``
+(Append-only JSON Lines format), NOT by relying on MCP's in-memory state.
 
 Architecture::
 
@@ -12,20 +14,19 @@ Architecture::
         │
         ▼
     Governor
-        ├── SlotIndex        (in-memory: slot_id → active node)
-        ├── RelationIndex    (in-memory: from→to bidirectional)
-        └── memory_service   (JSON Lines loader + MCP command builder)
+        ├── SlotIndex           (in-memory: slot_id → active node)
+        ├── RelationIndex       (in-memory: from→to bidirectional)
+        └── memory_service      (JSON Lines bootstrap + file append + MCP builder)
         │
-        ▼
-    MCP Memory Server
-        └── pkia-memory.json (persistence only, no queries)
+        ├── pkia-memory.json  (file: Source of Truth, append-only)
+        └── MCP Memory Server (ephemeral: query interface, rebuilt on restart)
 
 Lifecycle::
 
-    1. governor.startup(path)   — loads JSON Lines, builds indexes
-    2. governor.get_active(...) — O(1) lookup from SlotIndex
-    3. governor.write(...)      — validate → decide → return MCP commands
-    4. governor.shutdown()      — no-op (data persisted by MCP)
+    1. governor.startup(path)    — loads JSON Lines from file, builds indexes
+    2. governor.get_active(...)  — O(1) lookup from SlotIndex
+    3. governor.write(...)       — validate → decide → append to file → return MCP commands
+    4. governor.shutdown()       — no-op (data already persisted to file)
 
 Write decisions (mapping from Schema v1.0 rule set)::
 
@@ -71,7 +72,7 @@ class Governor:
         # Read
         node = gov.get_active("preference:response_language@global")
 
-        # Write
+        # Write (persists to file automatically)
         result = gov.write(WriteRequest(
             category="preference",
             key="response_language",
@@ -92,39 +93,42 @@ class Governor:
         """
         Load all data from the JSON Lines file and build in-memory indexes.
 
-        This is the only expensive operation — it reads the full graph.
+        This is the only expensive operation — it reads the full file.
         After startup, all reads are O(1) from memory.
+
+        The file is the SINGLE Source of Truth.  MCP in-memory state is
+        not consulted during startup.
         """
         self._storage_path = str(storage_path)
+
+        # Set the storage path for file persistence.
+        svc.set_storage_path(storage_path)
+
+        # Bootstrap from file (not from MCP).
         nodes, relations = svc.load_json_lines(storage_path)
 
-        # Index all MemoryNodes.
         for node in nodes:
             self.slot_index.index_node(node)
 
-        # Index all relations.
         self.relation_index.index_relations(relations)
 
         self._ready = True
         logger.info(
-            "Governor started: %d nodes, %d slots, %d relations",
+            "Governor started: %d nodes, %d slots, %d relations from %s",
             self.slot_index.node_count,
             self.slot_index.slot_count,
             self.relation_index.relation_count,
+            storage_path,
         )
 
     @property
     def is_ready(self) -> bool:
         return self._ready
 
-    # ── Read operations ────────────────────────────────────────────────
+    # ── Read operations (all O(1) from memory) ─────────────────────────
 
     def get_active(self, slot_id: str) -> Optional[MemoryNode]:
-        """
-        Return the ACTIVE MemoryNode for a given slot_id.
-
-        Pure memory lookup — does not call MCP.
-        """
+        """Return the ACTIVE MemoryNode for a given slot_id."""
         return self.slot_index.get_active(slot_id)
 
     def get_node(self, node_id: str) -> Optional[MemoryNode]:
@@ -140,15 +144,10 @@ class Governor:
         context: str,
         tier_filter: Optional[list[str]] = None,
     ) -> list[MemoryNode]:
-        """
-        Return all ACTIVE nodes in a given context.
-
-        Optionally filter by tier (category).
-        """
+        """Return all ACTIVE nodes in a given context, optionally filtered by tier."""
         nodes = self.slot_index.get_nodes_by_context(context)
         if tier_filter is not None:
             nodes = [n for n in nodes if n.category in tier_filter]
-        # Sort: identity > preference > project > working
         _tier_order = {"identity": 0, "preference": 1, "project": 2, "working": 3}
         nodes.sort(key=lambda n: (_tier_order.get(n.category, 9), -n.reinforcement_count))
         return nodes
@@ -162,18 +161,7 @@ class Governor:
         """
         Trace the version chain of a memory node.
 
-        Returns a list of TraceNode dicts (not MemoryNode objects) for
-        JSON-serializable output.  Each TraceNode has::
-
-            {
-                "node_id": "...",
-                "version": 3,
-                "status": "ACTIVE",
-                "value": "...",
-                "relationships": [
-                    {"type": "SUPERSEDED_BY", "target_id": "..."},
-                ]
-            }
+        Returns TraceNode dicts (JSON-serializable).
         """
         node_ids: list[str] = []
         if direction == "backward":
@@ -187,13 +175,11 @@ class Governor:
             if node is None:
                 continue
 
-            # Find relations from this node to the next in chain.
             rels: list[dict] = []
             if i + 1 < len(node_ids):
                 next_id = node_ids[i + 1]
                 if self.relation_index.has_target(nid, "SUPERSEDED_BY", next_id):
                     rels.append({"type": "SUPERSEDED_BY", "target_id": next_id})
-                # Also check DERIVED_FROM
                 derived = self.relation_index.get_targets(nid, "DERIVED_FROM")
                 for d in derived:
                     rels.append({"type": "DERIVED_FROM", "target_id": d})
@@ -215,34 +201,32 @@ class Governor:
 
     def write(self, request: WriteRequest) -> dict:
         """
-        Process a write request and return MCP command payloads.
+        Process a write request: validate, update indexes, persist to file,
+        and return MCP command payloads.
 
-        Decision tree (Schema v1.0 rules W01-W05, C01-C04):
+        Decision tree::
 
-        1. Check if the slot already has an ACTIVE node.
-           - No ACTIVE  → W05 (create new)
-           - Has ACTIVE → compare value → W02 (reinforce) or W04 (supersede)
+            1. Check if the slot already has an ACTIVE node.
+               - No ACTIVE  → W05 (create new)
+               - Has ACTIVE → compare value → W02 (reinforce) or W04 (supersede)
 
-        2. Return a dict with:
-           - "action": "created" | "reinforced" | "superseded" | "rejected"
-           - "node": the affected MemoryNode
-           - "commands": list of MCP tool payloads (Agent must execute these)
-           - "reason": explanation of the decision
+            2. Update in-memory indexes (immediately visible).
+
+            3. Append to pkia-memory.json (durable, append-only).
+
+            4. Return MCP commands (sync to MCP memory for query).
         """
         if not self._ready:
             raise RuntimeError("Governor not started. Call startup() first.")
 
         active_node = self.slot_index.get_active(request.slot_id)
 
-        # W05: No existing ACTIVE → create new.
         if active_node is None:
             return self._action_create(request)
 
-        # W01: Duplicate detection — same value?
         if active_node.value == request.value:
             return self._action_reinforce(active_node)
 
-        # W03 / C01-C04: Conflict — different value, run arbitration.
         return self._action_supersede(request, active_node)
 
     # ── Internal write actions ─────────────────────────────────────────
@@ -265,14 +249,15 @@ class Governor:
             version=1,
             reinforcement_count=1,
         )
+        has_memory = RelationRecord("PKIA_Project", node.node_id, "HAS_MEMORY")
 
-        # Register in memory index.
+        # 1. Update in-memory indexes (immediately visible for subsequent reads).
         self.slot_index.index_node(node)
-        self.relation_index.index_relation(RelationRecord(
-            source_id="PKIA_Project",
-            target_id=node.node_id,
-            relation_type="HAS_MEMORY",
-        ))
+        self.relation_index.index_relation(has_memory)
+
+        # 2. Persist to file (append-only JSON Lines).
+        svc.append_entity_to_file(node)
+        svc.append_relation_to_file(has_memory)
 
         return {
             "action": "created",
@@ -280,15 +265,24 @@ class Governor:
             "slot_id": node.slot_id,
             "version": node.version,
             "reason": f"New slot {node.slot_id}: created v{node.version}",
-            "commands": svc.build_create_result(node, [
-                RelationRecord("PKIA_Project", node.node_id, "HAS_MEMORY"),
-            ]),
+            "commands": svc.build_create_result(node, [has_memory]),
         }
 
     def _action_reinforce(self, active_node: MemoryNode) -> dict:
         """W02: Same value → reinforce existing node."""
         old_count = active_node.reinforcement_count
+
+        # 1. Update in-memory index.
         self.slot_index.reinforce_node(active_node.node_id)
+
+        # 2. Persist reinforcement event to file.
+        svc.append_observation_to_file(
+            active_node.node_id,
+            [
+                f"reinforcement_count: {active_node.reinforcement_count}",
+                f"updated_at: {active_node.updated_at.isoformat()}",
+            ],
+        )
 
         return {
             "action": "reinforced",
@@ -324,11 +318,9 @@ class Governor:
                 "commands": [],
             }
 
-        # C01 reverse: Agent inferred → but user explicitly says otherwise.
         if old_node.source_type == SourceType.AGENT_INFERRED and \
            request.source_type == SourceType.USER_EXPLICIT:
-            # Proceed with supersede — user always wins over agent inference.
-            pass
+            pass  # User always wins over agent inference.
 
         # C02-C04: Compare confidence if same source_type.
         if old_node.source_type == request.source_type:
@@ -344,7 +336,6 @@ class Governor:
                     ),
                     "commands": [],
                 }
-            # Equal confidence → newest wins (C03). Reinforcement count tiebreaker (C04).
 
         # ── Proceed with supersede ──────────────────────────────────────
         now = datetime.utcnow()
@@ -366,21 +357,24 @@ class Governor:
             reinforcement_count=1,
         )
 
-        # Update memory index.
+        supersedes = RelationRecord(new_node.node_id, old_node.node_id, "SUPERSEDED_BY")
+        has_memory = RelationRecord("PKIA_Project", new_node.node_id, "HAS_MEMORY")
+
+        # 1. Update in-memory indexes.
         self.slot_index.index_node(new_node)
         self.slot_index.update_node_status(old_node.node_id, "DEPRECATED")
 
-        # Update relation index.
-        self.relation_index.index_relation(RelationRecord(
-            source_id=new_node.node_id,
-            target_id=old_node.node_id,
-            relation_type="SUPERSEDED_BY",
-        ))
-        self.relation_index.index_relation(RelationRecord(
-            source_id="PKIA_Project",
-            target_id=new_node.node_id,
-            relation_type="HAS_MEMORY",
-        ))
+        self.relation_index.index_relation(supersedes)
+        self.relation_index.index_relation(has_memory)
+
+        # 2. Persist to file (append-only).
+        svc.append_entity_to_file(new_node)
+        svc.append_observation_to_file(
+            old_node.node_id,
+            [f"status: {MemoryStatus.DEPRECATED.value}"],
+        )
+        svc.append_relation_to_file(supersedes)
+        svc.append_relation_to_file(has_memory)
 
         return {
             "action": "superseded",
@@ -415,8 +409,7 @@ class Governor:
         """
         Shutdown the Governor.
 
-        Currently a no-op because data is persisted by MCP.
-        Future versions may flush pending writes or close connections.
+        No-op because every write has already been persisted to the file.
         """
         self._ready = False
         logger.info("Governor shut down.")
