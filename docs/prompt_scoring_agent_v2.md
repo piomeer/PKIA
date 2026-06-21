@@ -33,31 +33,96 @@ Reduce information overload. Help the user focus on high-value opportunities.
 
 Scoring Agent receives fully classified projects from Classification Agent.
 
+Scoring Agent consumes Stage 3 (Classification Output) data as defined by `project_data_schema_v1.md`. It does not redefine any classification fields.
+
 ### Input Data Structure
 
 | Field | Type | Source | Required |
 |-------|------|--------|----------|
-| Primary Category | String (Level-2) | Classification Agent | Yes |
-| Secondary Categories | List (0~3) | Classification Agent | No |
-| Classification Confidence | Percentage (0~100%) | Classification Agent | Yes |
-| Classification Notes | Text | Classification Agent | Yes |
+| `project_id` | string | Stage 1 (preserved through Classification) | Yes |
+| `project_name` | string | Stage 1 (preserved through Classification) | Yes |
+| `primary_category` | string (Level-2) | Classification Agent | Yes |
+| `secondary_categories` | list[string] (0~3) | Classification Agent | No |
+| `classification_confidence` | string (enum) | Classification Agent | Yes |
+| `classification_notes` | string | Classification Agent | Yes |
+| `pipeline_status` | string (enum) | Classification Agent | Yes |
+
+### Notes on Input Fields
+
+**`classification_confidence`** is an ENUM. Allowed values: `HIGH`, `MEDIUM`, `LOW`. Percentages are forbidden. This matches `project_data_schema_v1.md` §7.3 and `classification_agent_spec_v1.md` §7.
+
+**`pipeline_status`** — only `PROMOTED` projects reach the Scoring Agent. `FILTERED_BY_CATEGORY` projects are terminated before scoring.
+
+**`project_id`** — Scoring Agent must preserve this field unchanged. See Section 2.2 (Pipeline Status Handling) and Section 2.3 (Data Lineage Compatibility).
 
 ### Example Input
 
 ```
-Primary Category:      Agent Framework
-Secondary Categories:  Agent, Multi-Agent
-Classification Confidence: 92%
-Classification Notes:  Project focuses on agent orchestration and workflow execution.
-                      Primary Category maps to S Tier (Career Alignment base: 40).
+project_id:               gt-20260614-openmanus
+project_name:             OpenManus
+primary_category:         Agent Framework
+secondary_categories:     Multi-Agent → Coordination, Agent Application
+classification_confidence: HIGH
+classification_notes:     OpenManus is a community-driven Agent Framework with
+                          Tool Use, Planning, and Autonomous Execution capabilities.
+pipeline_status:          PROMOTED
 ```
 
 ### Rules
 
-- Primary Category is the sole basis for Career Alignment base score
-- Secondary Categories are used for Interest Match fine-tuning (+0~2) and Career Alignment bonus (+0~3)
-- Classification Confidence below 70% triggers a note in Reasoning: "Classification confidence is below 70%, scoring is based on current classification"
-- You must never override or question the Primary Category. If you believe the classification is wrong, note it in Reasoning but score based on the provided Primary Category
+- `primary_category` is the sole basis for Career Alignment base score
+- `secondary_categories` are used for Interest Match fine-tuning (+0~2) and Career Alignment bonus (+0~3)
+- `classification_confidence` of `LOW` triggers a note in Reasoning: "Classification confidence is LOW, scoring is based on current classification"
+- You must never override or question the `primary_category`. If you believe the classification is wrong, note it in Reasoning but score based on the provided `primary_category`
+- You must never modify `project_id`
+- You must never score a project with `pipeline_status` of `FILTERED_BY_CATEGORY`
+
+---
+
+## 2.2 Pipeline Status Handling
+
+Scoring Agent receives `pipeline_status` from Classification Agent.
+
+### Rules
+
+| Value | Scoring Agent Action |
+|-------|---------------------|
+| `PROMOTED` | Scoring Agent performs full scoring for all 4 dimensions |
+| `FILTERED_BY_CATEGORY` | Scoring Agent must not score this project. Scoring process terminates immediately |
+
+### Guard
+
+Before scoring begins, Scoring Agent must check `pipeline_status`:
+- If `pipeline_status` is `FILTERED_BY_CATEGORY`, skip scoring entirely
+- This project will enter `ARCHIVED` state without scoring
+
+Reference: `project_data_schema_v1.md` §11 (Pipeline Status Rules).
+
+---
+
+## 2.3 Data Lineage Compatibility
+
+Scoring Agent must preserve `project_id` without modification.
+
+The same `project_id` must appear unchanged in:
+
+- Scoring Output (Stage 4)
+- Ranking Stage (Stage 5)
+- Report Generation (Stage 6)
+
+Reference: `project_data_schema_v1.md` §12 (Data Lineage Rules).
+
+---
+
+## 2.4 career_goal_impact Ownership
+
+`career_goal_impact` belongs to Stage 4 (Scoring Output), as defined by `project_data_schema_v1.md` §8.2.
+
+Scoring Agent **produces** this field.
+
+Report Generation Pipeline **consumes** it.
+
+Scoring Agent does **not** redefine its schema. The field structure is owned by `project_data_schema_v1.md`.
 
 ---
 
@@ -215,7 +280,7 @@ Adjustments (within range, up to ±3 from base):
 - Directly referenced by PKIA as implementation platform → +1~3
 - Secondary Categories support additional career goals → +0~3 (capped at 40)
 - Abstract or indirect connection → -1~3
-- Classification Confidence < 70% → -1~3
+- `classification_confidence` is `LOW` → -1~3
 
 ### Interest Match (0~30)
 
@@ -421,16 +486,19 @@ You MUST follow these principles:
 
 ### Example 1: OpenManus
 
-**Input from Classification Agent:**
+**Input from Classification Agent (Stage 3 data):**
 ```
-Primary Category: Agent Framework
-Secondary Categories: Multi-Agent → Coordination, Agent Application
-Classification Confidence: 94%
-Classification Notes: OpenManus is a community-driven Agent Framework with
-Tool Use, Planning, and Autonomous Execution capabilities.
+project_id:               gt-20260614-openmanus
+project_name:             OpenManus
+primary_category:         Agent Framework
+secondary_categories:     Multi-Agent → Coordination, Agent Application
+classification_confidence: HIGH
+classification_notes:     OpenManus is a community-driven Agent Framework with
+                          Tool Use, Planning, and Autonomous Execution capabilities.
+pipeline_status:          PROMOTED
 ```
 
-**Output:**
+**Output (Stage 4 data):**
 
 ```
 Project: OpenManus
@@ -468,23 +536,26 @@ and #4 (Multi-Agent System Engineer) through its multi-agent
 coordination capabilities. Community attention is explosive,
 confirming strong Trend Heat. Research value is above average
 due to its novel integration of Tool Use and Planning.
-Classification Confidence is 94%, no concerns.
+classification_confidence is HIGH, no concerns.
 ```
 
 ---
 
 ### Example 2: Dify
 
-**Input from Classification Agent:**
+**Input from Classification Agent (Stage 3 data):**
 ```
-Primary Category: Agent Platform
-Secondary Categories: AI Engineering → Workflow, RAG → RAG Framework, MCP → MCP Ecosystem
-Classification Confidence: 95%
-Classification Notes: Dify is an integrated AI application development platform.
-Primary is Agent Platform (S Tier). Secondary covers Workflow, RAG, and MCP.
+project_id:               gt-20260614-dify
+project_name:             Dify
+primary_category:         Agent Platform
+secondary_categories:     AI Engineering → Workflow, RAG → RAG Framework, MCP → MCP Ecosystem
+classification_confidence: HIGH
+classification_notes:     Dify is an integrated AI application development platform.
+                          Primary is Agent Platform (S Tier). Secondary covers Workflow, RAG, and MCP.
+pipeline_status:          PROMOTED
 ```
 
-**Output:**
+**Output (Stage 4 data):**
 
 ```
 Project: Dify
@@ -522,23 +593,26 @@ Dify is not just a tool but the underlying implementation platform,
 which elevates its career relevance for goals #1 and #2. Three
 Secondary Categories (Workflow, RAG, MCP) demonstrate its breadth.
 Trend Heat has stabilized. Recommended as a platform to track
-continuously. Classification Confidence is 95%, high reliability.
+continuously. classification_confidence is HIGH, high reliability.
 ```
 
 ---
 
 ### Example 3: MCP Server Framework
 
-**Input from Classification Agent:**
+**Input from Classification Agent (Stage 3 data):**
 ```
-Primary Category: MCP Server
-Secondary Categories: MCP → MCP Framework
-Classification Confidence: 88%
-Classification Notes: Core SDK for building MCP Servers. MCP is becoming
-the standard protocol for Agent Tool Use.
+project_id:               gt-20260614-mcp-server
+project_name:             MCP Server Framework
+primary_category:         MCP Server
+secondary_categories:     MCP → MCP Framework
+classification_confidence: HIGH
+classification_notes:     Core SDK for building MCP Servers. MCP is becoming
+                          the standard protocol for Agent Tool Use.
+pipeline_status:          PROMOTED
 ```
 
-**Output:**
+**Output (Stage 4 data):**
 
 ```
 Project: MCP Server Framework
@@ -574,7 +648,7 @@ MCP Server Framework is classified as MCP Server (A Tier, base 30).
 Career Alignment elevated because MCP is essential for Agent Tool Use —
 a core capability for career goals #1 and #4. MCP ecosystem is in
 rapid growth phase, reflected in high Trend Heat. Research value comes
-from protocol-level standardization. Classification Confidence is 88%,
+from protocol-level standardization. classification_confidence is HIGH,
 good reliability.
 ```
 
@@ -582,16 +656,19 @@ good reliability.
 
 ### Example 4: Agent Memory Framework (Mem0, Zep, Letta, OpenMemory)
 
-**Input from Classification Agent:**
+**Input from Classification Agent (Stage 3 data):**
 ```
-Primary Category: Memory Framework
-Secondary Categories: Agent
-Classification Confidence: 96%
-Classification Notes: Agent Memory frameworks are the core infrastructure
-for stateful Agent systems. Multiple frameworks showing strong community activity.
+project_id:               gt-20260614-agent-memory
+project_name:             Agent Memory Framework
+primary_category:         Memory Framework
+secondary_categories:     Agent
+classification_confidence: HIGH
+classification_notes:     Agent Memory frameworks are the core infrastructure
+                          for stateful Agent systems. Multiple frameworks showing strong community activity.
+pipeline_status:          PROMOTED
 ```
 
-**Output:**
+**Output (Stage 4 data):**
 
 ```
 Project: Agent Memory Framework (Mem0 / Zep / Letta / OpenMemory)
@@ -630,31 +707,33 @@ base 40). This is the highest priority category for PKIA because
 Agent → Stateful Agent → Personal Knowledge Agent is the core
 evolution path. Both career goal #1 and #4 benefit directly.
 Research Relevance is maximized (10) because memory mechanisms are
-an active research area with direct PKIA relevance. Classification
-Confidence is 96%, very high reliability.
+an active research area with direct PKIA relevance. classification_confidence is HIGH, very high reliability.
 ```
 
 ---
 
 ### Example 5: MarkItDown
 
-**Input from Classification Agent:**
+**Input from Classification Agent (Stage 3 data):**
 ```
-Primary Category: Unclassified AI Project
-Secondary Categories: RAG → Knowledge Ingestion
-Classification Confidence: 55%
-Classification Notes: MarkItDown converts various file formats to Markdown.
-Functionally close to RAG Knowledge Ingestion (document preprocessing),
-but strictly speaking not part of the RAG ecosystem. No existing Taxonomy
-category fits precisely.
+project_id:               gt-20260619-markitdown
+project_name:             MarkItDown
+primary_category:         UNCLASSIFIED_AI_PROJECT
+secondary_categories:     RAG → Knowledge Ingestion
+classification_confidence: LOW
+classification_notes:     MarkItDown converts various file formats to Markdown.
+                          Functionally close to RAG Knowledge Ingestion (document preprocessing),
+                          but strictly speaking not part of the RAG ecosystem. No existing Taxonomy
+                          category fits precisely.
+pipeline_status:          PROMOTED
 ```
 
-**Output:**
+**Output (Stage 4 data):**
 
 ```
 Project: MarkItDown
 
-Primary Category: Unclassified AI Project
+Primary Category: UNCLASSIFIED_AI_PROJECT
 
 Secondary Categories: RAG → Knowledge Ingestion
 
@@ -683,14 +762,14 @@ Career Goal Impact:
 #4 Multi-Agent System Engineer: Low — no multi-agent relevance
 
 Reasoning:
-MarkItDown is classified as Unclassified AI Project (base 5~15).
+MarkItDown is classified as UNCLASSIFIED_AI_PROJECT (base 5~15).
 It is a document conversion utility, functionally adjacent to RAG's
 Knowledge Ingestion but not a core RAG component. Career Alignment
 is limited — it supports RAG pipeline preprocessing (career goal #2)
 but does not directly serve any primary career goal. Trend Heat is
 moderate. Research value is low. Total Score of 33 places it in
-Ignore. Classification Confidence is 55%, below 70% — scoring is
-based on current classification with noted uncertainty.
+Ignore. classification_confidence is LOW — scoring is based on
+current classification with noted uncertainty.
 ```
 
 ---
@@ -712,16 +791,25 @@ project_classification_taxonomy_v1.md
         ↓
 classification_agent_spec_v1.md
   Defines: How projects are classified
-  Produces: Primary Category, Secondary Categories, Confidence, Notes
+  Produces: classification_confidence, primary_category, secondary_categories
   Used by: Scoring Agent as input (Section 2: Category Input Contract)
+        ↓
+project_data_schema_v1.md (authoritative data contract)
+  Defines: All data structures across 6 stages
+  Owns: field definitions, field ownership, data lineage rules
         ↓
 prompt_scoring_agent_v2.md (THIS DOCUMENT)
   Defines: How scored projects are evaluated
   Produces: 4 dimension scores + Total + Recommendation + Career Goal Impact
+  Consumes: Stage 3 data structured by project_data_schema_v1.md
         ↓
 scoring_pipeline_schema_v1.md
   Defines: How scoring is orchestrated (10 stages)
   Consumes: Scoring Agent output for Stage 4~7
+        ↓
+report_generation_pipeline_v1.md
+  Defines: How reports are generated from scored projects
+  Consumes: Stage 5 (Ranking Output) data
         ↓
 daily_report_spec_v1.md
   Defines: What the daily report looks like (6 sections)
@@ -734,9 +822,11 @@ daily_report_spec_v1.md
 |----------|------|------------|
 | interest_profile_v1.md | Interest definition | User's S/A/B Tiers, Career Goals |
 | project_classification_taxonomy_v1.md | Category definition | 11 Level-1, 32 Level-2 categories |
-| classification_agent_spec_v1.md | Classification execution | Primary + Secondary + Confidence |
+| classification_agent_spec_v1.md | Classification execution | primary_category, secondary_categories, classification_confidence |
+| **project_data_schema_v1.md** | **Data contract** | **All field definitions across 6 pipeline stages** |
 | **prompt_scoring_agent_v2.md** | **Scoring execution** | **4 scores + Total + Recommendation + Career Goal Impact** |
 | scoring_pipeline_schema_v1.md | Pipeline orchestration | 10-stage scoring flow |
+| report_generation_pipeline_v1.md | Report generation | Ranked projects → Report Items |
 | daily_report_spec_v1.md | Report format | 6-section daily report template |
 
 ### Key Principle
