@@ -568,6 +568,51 @@ Memory Governor 是 L2 层的治理引擎。本节以规则表的形式定义 Go
 
 ---
 
+## 5.6 Memory Namespace Strategy
+
+For future Dual-Memory support, all slots must follow a namespace convention that
+distinguishes Workspace Memory from User Memory.
+
+### 5.6.1 Namespace Format
+
+```
+<domain>:<category>:<key>@<context>
+```
+
+| Component | Values | Description |
+|-----------|--------|-------------|
+| `domain` | `workspace` / `user` | Memory domain identifier |
+| `category` | `identity` / `preference` / `project` / `working` | Memory tier |
+| `key` | snake_case | Memory key |
+| `context` | string | Context qualifier |
+
+### 5.6.2 Examples
+
+| Full slot_id | Domain | Category | Key |
+|-------------|--------|----------|-----|
+| `workspace:identity:research_field@global` | Workspace | Identity | research_field |
+| `user:preference:response_language@global` | User | Preference | response_language |
+| `workspace:project:project_phase@PKIA_Project` | Workspace | Project | project_phase |
+
+### 5.6.3 Storage Mapping
+
+| Domain | File | Status |
+|--------|------|--------|
+| `workspace/*` | `cline-memory.json` | ✅ Active (v0.1) |
+| `user/*` | `pkia-user-memory.json` | ❌ Reserved for future |
+
+### 5.6.4 Resolution Rule
+
+When a WriteRequest or ReadRequest does not specify a domain:
+
+1. Check if the slot exists in `workspace/*` namespace
+2. If not found and `user/*` is configured, fall back to `user/*`
+3. If neither exists, treat as `workspace/*` (backward compatible)
+
+For detailed boundary definitions, see `memory_boundary_v1.0.md`.
+
+---
+
 ## 6. Migration Strategy
 
 本节定义从当前图谱状态迁移到 PKIA L2 Schema 的策略。迁移仅涉及图谱数据的结构调整，不涉及代码实现。

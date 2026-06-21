@@ -11,7 +11,7 @@ Verifies core invariants from memory_schema_v1.0.md:
   6. Trace Completeness
 
 Each test uses a temporary JSON Lines file so it does NOT touch
-the real pkia-memory.json.
+the real cline-memory.json.
 """
 
 from __future__ import annotations

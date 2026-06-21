@@ -324,7 +324,7 @@ digraph PKIA_L2_Governor {
 ### 启动流程
 
 ```
-memory_service.load_json_lines("pkia-memory.json")
+memory_service.load_json_lines("cline-memory.json")
   │
   ├── 返回: (list[MemoryNode], list[RelationRecord])
   │

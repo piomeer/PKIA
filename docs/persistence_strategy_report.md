@@ -248,6 +248,39 @@ def append_to_file(path: str, line: dict) -> None:
 
 ---
 
+## 5.4 Multi-Memory Source of Truth
+
+For future Dual-Memory support, the Source of Truth model extends to multiple files.
+
+### Directory Layout
+
+```
+memory/
+├── cline-memory.json          # Workspace Memory (current, v0.1)
+└── pkia-user-memory.json      # User Memory (reserved for future)
+```
+
+### Multi-File Governance
+
+Each file maintains its own:
+
+- **Slot Index** (per-file, in Governor memory)
+- **Relation Index** (per-file, in Governor memory)
+- **Append-only JSON Lines** (per-file, on disk)
+
+### Source of Truth Hierarchy
+
+```
+cli├──ne-memory.json          # Workspace Memory: Source of Truth for workspace/*
+    └── pkia-user-memory.json      # User Memory: Source of Truth for user/*
+```
+
+Governor routes writes to the appropriate file based on domain namespace.
+
+For detailed boundary definitions, see `memory_boundary_v1.0.md`.
+
+---
+
 ## 6. 变更清单
 
 需要修改的代码：

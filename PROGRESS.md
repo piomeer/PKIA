@@ -9,7 +9,7 @@
 
 ## ⚠️ 活跃约束提醒 (Active Constraints)
 - **严禁未经确认自动 push** — 所有 Git 推送必须等待用户明确批准
-- **L2 图谱保护**：`pkia-memory.json` 禁止手动编辑，必须通过 MCP memory 服务器操作
+- **L2 图谱保护**：`cline-memory.json` 禁止手动编辑，必须通过 MCP memory 服务器操作
 - **Bouncer Protocol 强制**：任务结束时必须执行三步骤（生成 payload → 运行门禁脚本 → 验证销毁）
 - **门禁脚本未创建**：`utils/memory_bouncer.py` 尚不存在，后续需补齐
 

@@ -9,7 +9,7 @@ Verifies that:
   5. startup on empty file → empty index
 
 Each test uses a temporary JSON Lines file so it does NOT touch the
-real pkia-memory.json.
+real cline-memory.json.
 """
 
 from __future__ import annotations

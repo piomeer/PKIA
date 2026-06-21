@@ -934,6 +934,49 @@ mem_draft_001 ── DERIVED_FROM ──► mem_conversation_log_042 (源证据)
 
 ---
 
+## 11.5 Future Memory Domains
+
+L2 Memory System 将扩展为支持多个记忆域（Memory Domains），每个域服务于不同的数据生产者和消费者。
+
+### 11.5.1 Workspace Memory
+
+| 属性 | 值 |
+|------|-----|
+| 文件 | `cline-memory.json` |
+| 数据生产者 | Cline Agent（开发智能体） |
+| 数据消费者 | Cline Agent（同一 workspace） |
+| 内容 | 架构决策、项目历史、开发过程、技术方案 |
+| 生命周期 | 与 workspace 绑定 |
+
+### 11.5.2 User Memory
+
+| 属性 | 值 |
+|------|-----|
+| 文件 | `pkia-user-memory.json`（预留） |
+| 数据生产者 | 用户（通过对话界面） |
+| 数据消费者 | PKIA Agent（所有 workspace） |
+| 内容 | Identity, Preference, Project Context, Fact, Decision |
+| 生命周期 | 跨 workspace 持久 |
+
+### 11.5.3 域隔离规则
+
+- 每个 Memory Domain 使用独立的 JSON Lines 文件
+- 各域的 Memory_Node 互不相通
+- Governor 在写入时指定 target domain
+- 检索时按 domain 限定范围
+- 跨域迁移需通过显式的迁移流程（用户确认）
+
+### 11.5.4 命名空间规划
+
+```
+workspace/*  →  Workspace Memory（cline-memory.json）
+user/*       →  User Memory（pkia-user-memory.json）
+```
+
+有关边界定义和禁止事项的详细说明，请参见 `memory_boundary_v1.0.md`。
+
+---
+
 ## 12. Future Extensions
 
 以下方向为未来的版本规划，不在当前 v1.1 规范的范围之内。列于此作为架构预留。

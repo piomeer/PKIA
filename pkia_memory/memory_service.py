@@ -12,7 +12,7 @@ This module handles three concerns:
    returns structured payload descriptions, and the Agent executes them.
 
 3. **File persistence**: appends entities, relations, and observations to
-   the JSON Lines file (``pkia-memory.json``).  This is the ONLY durable
+   the JSON Lines file (``cline-memory.json``).  This is the ONLY durable
    storage layer.  MCP memory is ephemeral and rebuilt on restart.
 """
 
@@ -57,7 +57,7 @@ def load_json_lines(path: str | Path) -> tuple[list[MemoryNode], list[RelationRe
 
     This is the bootstrap entry point, called once during Governor startup::
 
-        nodes, relations = load_json_lines("pkia-memory.json")
+        nodes, relations = load_json_lines("cline-memory.json")
         for node in nodes:
             slot_index.index_node(node)
         relation_index.index_relations(relations)
@@ -175,7 +175,7 @@ def new_node_id() -> str:
 
 # ── File persistence layer ─────────────────────────────────────────────
 #
-# These functions append data to pkia-memory.json in JSON Lines format.
+# These functions append data to cline-memory.json in JSON Lines format.
 # They are the ONLY persistent storage — MCP memory is ephemeral.
 #
 # All writes are append-only.  Historical records are never modified.
