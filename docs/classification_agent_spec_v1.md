@@ -23,6 +23,16 @@ Classification First
 Scoring Second
 ```
 
+### classification_confidence 说明
+
+`classification_confidence` 是枚举值（ENUM），不是概率分数，不是百分比。仅允许三个值：
+
+- `HIGH`
+- `MEDIUM`
+- `LOW`
+
+此定义与 `project_data_schema_v1.md` §7.3 保持一致。任何百分比形式的置信度（如 `92%`、`0.83`）均不被接受。
+
 违反这条原则的后果：如果分类错误，Scoring Agent 的 Career Alignment 评分和 Interest Match 评分都会建立在错误的基础上。一个实际属于 Agent Framework 的项目如果被错误地分类为 Knowledge Graph，其 Career Alignment 分数会从 40 分降为 10 分，直接导致该项目被错误地置入 Observe 甚至 Ignore 等级。
 
 Classification Agent 的定位是"守门员"——它决定了哪些项目以什么身份进入评分管线。
@@ -42,8 +52,16 @@ Project Normalization (统一数据结构)
   │  分类层：项目→类别      │
   └─────────┬───────────────┘
             ↓
+  ┌─ Project Data Schema ──┐
+  │  数据契约层：定义数据结构│
+  └─────────┬───────────────┘
+            ↓
   ┌─ Scoring Agent ─────────┐
   │  评分层：类别→分数       │
+  └─────────┬───────────────┘
+            ↓
+  ┌─ Scoring Pipeline ──────┐
+  │  流程层：编排评分流程    │
   └─────────┬───────────────┘
             ↓
   ┌─ Report Generation ─────┐
@@ -69,7 +87,7 @@ Classification Agent 的输入来自 Project Normalization 阶段（基于 proje
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| Project Name | 字符串 | GitHub 仓库名称或项目名称 |
+| project_name | string | GitHub 仓库名称。在所有 PKIA 文档中使用此名称（project_data_schema_v1.md §3.2） |
 | Description | 字符串 | 项目的核心描述，通常来自 GitHub README 或 Topics 描述 |
 | Topics | 字符串列表 | 项目的 GitHub Topics 标签 |
 | Stars | 整数 | 项目的 GitHub Stars 数量（作为辅助信号） |
@@ -79,15 +97,15 @@ Classification Agent 的输入来自 Project Normalization 阶段（基于 proje
 
 | 字段 | 类型 | 预计接入版本 |
 |------|------|-------------|
-| README Summary | 字符串（摘要） | v0.3 |
-| Repository Language | 字符串 | v0.2 |
-| Last Updated | 日期 | v0.2 |
-| License | 字符串 | v0.2 |
+| readme_summary | string | v0.3 |
+| repository_language | string | v0.2 |
+| last_updated | date | v0.2 |
+| license | string | v0.2 |
 
 ### 关键约束
 
 - Classification Agent **不依赖评分结果**。它不需要知道 Career Alignment 分数或 Total Score 就能完成分类。
-- 输入缺失处理：如果 Description 为空，Classification Agent 应仅基于 Topics 和 Project Name 进行分类，并在 Classification Notes 中注明"Description 缺失，分类基于 Topics 推断"。
+- 输入缺失处理：如果 Description 为空，Classification Agent 应仅基于 Topics 和 project_name 进行分类，并在 classification_notes 中注明"Description 缺失，分类基于 Topics 推断"。
 - 项目名称不能作为唯一的分类依据。例如"OpenManus"这个名称本身不提供分类信息，必须结合 Description 和 Topics。
 
 ---
@@ -100,10 +118,10 @@ Classification Agent 的输出是 Scoring Agent 的输入。
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| Primary Category | 字符串 | 是 | 项目的主要类别，必须是 Taxonomy 定义的 Level-2 类别、Emerging Category、Unclassified AI Project 之一 |
-| Secondary Categories | 字符串列表 | 否（0~3个） | 项目的次要类别，用于 Interest Match 精细调整 |
-| Confidence Level | High/Medium/Low | 是 | Classification Agent 对自己分类结果的信心程度 |
-| Classification Notes | 字符串 | 是 | 分类依据的简短说明，必须解释为什么选择该 Primary Category |
+| primary_category | string | 是 | 项目的主要类别，必须是 Taxonomy 定义的 Level-2 类别或特殊类别之一 |
+| secondary_categories | list[string] | 否（0~3个） | 项目的次要类别，用于 Interest Match 精细调整 |
+| classification_confidence | string (enum) | 是 | 仅允许 `HIGH` / `MEDIUM` / `LOW`。不是概率分数，不是百分比 |
+| classification_notes | string | 是 | 分类依据的简短说明，必须解释为什么选择该 Primary Category |
 
 ### 字段说明
 
@@ -113,8 +131,11 @@ Classification Agent 的输出是 Scoring Agent 的输入。
 **Secondary Categories：**
 补充描述项目的其他能力维度。每个 Secondary Category 必须引用 Taxonomy 定义的标准类别名（如"Multi-Agent → Coordination"而非自定义标签）。最多 3 个，0 个也是合法的。
 
-**Confidence Level：**
-Classification Agent 对自己判断的信心程度。High 表示分类明确，Medium 表示存在一些模糊性，Low 表示推测性分类。
+**classification_confidence：**
+Classification Agent 对自己判断的信心程度。这是一个枚举值（ENUM），不是概率分数，也不是百分比。
+- `HIGH` — 分类明确，无歧义
+- `MEDIUM` — 存在一定模糊性，但可做出合理判断
+- `LOW` — 推测性分类，需要下游谨慎处理
 
 **Classification Notes：**
 分类的理由说明。必须包含：为什么选择这个 Primary Category、是否考虑了多个候选类别、最终决策的依据。格式为自然语言段落，不少于 1 句话。
@@ -123,13 +144,69 @@ Classification Agent 对自己判断的信心程度。High 表示分类明确，
 
 ```
 Project: LangGraph
-Primary Category: Agent Framework
-Secondary Categories: Multi-Agent → Coordination, Agent Memory → Memory Framework
-Confidence Level: High
-Classification Notes: LangGraph 是 LangChain 生态中的 Agent 工作流编排框架，
+primary_category: Agent Framework
+secondary_categories: Multi-Agent → Coordination, Agent Memory → Memory Framework
+classification_confidence: HIGH
+classification_notes: LangGraph 是 LangChain 生态中的 Agent 工作流编排框架，
 核心能力是图状执行流程。Primary 归为 Agent Framework（S Tier）。
 其多 Agent 协作能力和 LangMem 集成使其同时具备 Multi-Agent 和 Agent Memory 属性。
 ```
+
+---
+
+## 4.1 Pipeline Status
+
+Classification Agent must output `pipeline_status` along with the classification results.
+
+### Allowed Values
+
+| Value | Meaning |
+|-------|---------|
+| `PROMOTED` | Project successfully classified and continues to scoring stage |
+| `FILTERED_BY_CATEGORY` | Project identified as non-AI project or outside PKIA tracking scope. Project stops before scoring stage. |
+
+### Rules
+
+- Projects classified with Primary Category in the Ignore list (Frontend, Mobile, Blockchain, Crypto, NFT, Web3) should be set to `FILTERED_BY_CATEGORY`.
+- All other projects should be set to `PROMOTED`.
+- `FILTERED_BY_CATEGORY` projects are not passed to the Scoring Agent. They enter `pipeline_status: ARCHIVED` after classification is complete.
+
+Reference: `project_data_schema_v1.md` §11 (Pipeline Status Rules).
+
+---
+
+## 4.2 Schema Ownership
+
+Classification Agent does NOT define the following fields. These fields are owned by `project_data_schema_v1.md`:
+
+- `project_name`
+- `project_id`
+- `source`
+- `collection_date`
+
+Classification Agent only produces:
+
+- `primary_category`
+- `secondary_categories`
+- `classification_confidence`
+- `classification_notes`
+- `pipeline_status`
+
+This enforces the **Single Source of Truth** principle. All data structure definitions originate from `project_data_schema_v1.md`, not from any Agent documentation.
+
+---
+
+## 4.3 Data Lineage Compatibility
+
+Classification Agent must preserve `project_id` without modification.
+
+The same `project_id` must flow unchanged into:
+
+- Scoring Agent
+- Ranking Stage
+- Report Generation
+
+The `project_id` is the backbone of PKIA data lineage (project_data_schema_v1.md §12). Any modification to `project_id` during the classification stage would break the traceability chain, making it impossible to trace a scored project back to its raw GitHub data.
 
 ---
 
@@ -569,7 +646,15 @@ Secondary 指向最接近的现有类别。建议观察是否有更多类似的
                        │ 提供分类结果
                        ▼
 ┌──────────────────────────────────────────────────────────┐
-│  scoring_agent (prompt_scoring_agent_v1.md 执行)         │
+│  project_data_schema_v1.md (数据契约)                    │
+│  职责：定义数据长什么样                                    │
+│  所有字段的定义来源                                        │
+│  回答："数据契约是什么"                                    │
+└──────────────────────┬───────────────────────────────────┘
+                       │ 提供数据结构定义
+                       ▼
+┌──────────────────────────────────────────────────────────┐
+│  scoring_agent (prompt_scoring_agent_v2.md 执行)         │
 │  职责：定义"每个类别值多少分"                              │
 │  输出：Career Alignment + Interest Match + ...           │
 │  回答："这个项目值多少分"                                  │
@@ -580,8 +665,34 @@ Secondary 指向最接近的现有类别。建议观察是否有更多类似的
 │  scoring_pipeline_schema_v1.md                          │
 │  职责：定义"如何执行评分"                                 │
 │  回答："评分流程是什么"                                    │
+└──────────────────────┬───────────────────────────────────┘
+                       │ 提供排序结果
+                       ▼
+┌──────────────────────────────────────────────────────────┐
+│  report_generation_pipeline_v1.md                       │
+│  职责：定义"如何生成日报"                                 │
+│  回答："报告流程是什么"                                    │
+└──────────────────────┬───────────────────────────────────┘
+                       │ 输出日报
+                       ▼
+┌──────────────────────────────────────────────────────────┐
+│  daily_report_spec_v1.md                                │
+│  职责：定义"日报长什么样"                                 │
+│  回答："用户看到什么"                                     │
 └──────────────────────────────────────────────────────────┘
 ```
+
+### 12.2 文档职责层级
+
+| 层级 | 文档 | 职责 |
+|------|------|------|
+| 定义层 | Taxonomy, Interest Profile, Scoring Strategy | 定义分类体系、兴趣画像、评分规则 |
+| 执行层 | Classification Agent, Scoring Agent | 执行分类和评分 |
+| **数据契约层** | **project_data_schema_v1.md** | **定义所有数据结构和字段** |
+| 流程层 | Scoring Pipeline, Report Generation Pipeline | 编排数据流转和报告生成 |
+| 展示层 | Daily Report Spec | 定义用户看到的日报格式 |
+
+`project_data_schema_v1.md` 是唯一的权威数据契约（authoritative data contract）。所有 Agent 和 Pipeline 的数据结构定义必须向它对齐。
 
 ### 12.2 各文档关系
 
