@@ -357,6 +357,9 @@ class Governor:
             reinforcement_count=1,
         )
 
+        # Touch old node's updated_at before marking DEPRECATED.
+        old_node.updated_at = now
+
         supersedes = RelationRecord(new_node.node_id, old_node.node_id, "SUPERSEDED_BY")
         has_memory = RelationRecord("PKIA_Project", new_node.node_id, "HAS_MEMORY")
 

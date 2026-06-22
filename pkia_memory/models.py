@@ -47,6 +47,12 @@ class MemoryNode:
 
     This is the fundamental unit of the L2 Memory OS. Every fact, preference,
     project context, or working note is stored as a MemoryNode.
+
+    Timestamp fields (created_at, updated_at):
+      - created_at: set once on creation, never modified.
+      - updated_at: updated on every state change (reinforce, supersede, status change).
+      - For legacy records loaded from disk, these may be None if the
+        observation data did not contain them. All new writes always include both.
     """
 
     node_id: str
@@ -57,8 +63,8 @@ class MemoryNode:
     status: MemoryStatus
     confidence: float
     source_type: SourceType
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     expires_at: Optional[datetime] = None
     version: int = 1
     reinforcement_count: int = 1
@@ -91,6 +97,9 @@ class MemoryNode:
 
         Observation format: ``field_name: field_value``
         Example: ``"category: identity"``
+
+        Backward compatible: missing ``created_at`` or ``updated_at``
+        observations result in ``None`` (no crash).
         """
         raw: dict[str, str] = {}
         for obs in observations:
@@ -121,8 +130,8 @@ class MemoryNode:
             status=MemoryStatus(_get("status", "ACTIVE")),
             confidence=float(_get("confidence", "1.0")),
             source_type=SourceType(_get("source_type", "USER_EXPLICIT")),
-            created_at=_parse_dt(_get("created_at")) or datetime.utcnow(),
-            updated_at=_parse_dt(_get("updated_at")) or datetime.utcnow(),
+            created_at=_parse_dt(_get("created_at")),
+            updated_at=_parse_dt(_get("updated_at")),
             expires_at=_parse_dt(_get("expires_at")),
             version=int(_get("version", "1")),
             reinforcement_count=int(_get("reinforcement_count", "1")),
@@ -141,11 +150,13 @@ class MemoryNode:
             f"status: {self.status.value}",
             f"confidence: {self.confidence}",
             f"source_type: {self.source_type.value}",
-            f"created_at: {self.created_at.isoformat()}",
-            f"updated_at: {self.updated_at.isoformat()}",
             f"version: {self.version}",
             f"reinforcement_count: {self.reinforcement_count}",
         ]
+        if self.created_at is not None:
+            obs.append(f"created_at: {self.created_at.isoformat()}")
+        if self.updated_at is not None:
+            obs.append(f"updated_at: {self.updated_at.isoformat()}")
         if self.expires_at is not None:
             obs.append(f"expires_at: {self.expires_at.isoformat()}")
         return obs
