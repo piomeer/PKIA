@@ -52,34 +52,98 @@
 
 ## 4. 数据库保护红线
 
-- **L2 图谱层文件**（`pkia-memory.json`）：绝对禁止使用普通文本编辑工具格式化、美化或手动编辑
-- **所有 L2 更新** 必须通过 MCP `memory` 服务器的工具（`create_entities`、`create_relations`、`add_observations`、`delete_entities` 等）进行
+- **L2 图谱层文件**（`cline-memory.json`）：绝对禁止使用普通文本编辑工具格式化、美化或手动编辑
+- **所有 L2 更新** 必须通过 MCP `memory` 服务器的工具（`create_entities`、`create_relations`、`add_observations`、`delete_entities` 等）或 Governor API 进行
 - **L3 进度层**（`PROGRESS.md`）：使用标准 Markdown，可直接编辑
 
-## 5. 记忆流转强制协议 (Bouncer Protocol)
+## 5. Memory Governance（强制流程）
 
-结束任务时，必须执行以下三步：
+### 5.1 Agent 生命周期
 
-### Step 1: 准备 payload
-生成 `.memory_payload.json`，结构：
-```json
-{
-  "l1_reflection": "宪法执行情况与盲区反思",
-  "l2_graph_updates": [
-    {"type": "entity", "name": "...", "entityType": "...", "observations": [...]},
-    {"type": "relation", "from": "...", "to": "...", "relationType": "..."}
-  ],
-  "l3_progress_notes": "坑点、耗时、核心优化点沉淀",
-  "next_steps": "为下一个循环准备的指令",
-  "commit_message": "简明Git提交信息"
-}
+每次任务必须按以下顺序执行：
+
+```
+Task → Memory Review → L2 Update(如需) → L3 Update → Receipt → Completion Gate → attempt_completion
 ```
 
-### Step 2: 呼叫门禁脚本
-运行 `python utils/memory_bouncer.py`（Exit Code 0 表示成功）
+### 5.2 任务结束前强制检查清单
 
-### Step 3: 验证与移交
-确认脚本返回 0 后，销毁 payload 文件，汇报任务闭环。
+#### L2 Review（长期记忆检查）
+
+```
+□ 架构决策变更？（技术栈/架构模式/约束）
+  → 需要: Governor.write() → architecture:*@*
+□ 长期事实变更？（项目阶段/里程碑/基线）
+  → 需要: Governor.write() → project:*@*
+□ 规范变更？（Schema/Protocol/API）
+  → 需要: Governor.write() → project:*@*
+□ 系统行为变更？（Governor/持久化）
+  → 需要: Governor.write() → architecture:*@*
+```
+
+#### L3 Review（进度同步检查）
+
+```
+□ 任务完成？ → 更新 PROGRESS.md「✅ 已完成」
+□ 阶段完成？ → 更新 PROGRESS.md「🎯 当前活动目标」
+□ 阻塞解除？ → 更新 PROGRESS.md「⛔ 已知卡点」
+□ 新阶段启动？ → 更新 PROGRESS.md「🚀 下一步计划」
+```
+
+### 5.3 快速判定表
+
+| 任务类型 | L2 同步 | L3 同步 |
+|---------|:-------:|:-------:|
+| Bug 修复 | ❌ | ✅ |
+| 功能实现 | ⚠️ 仅架构影响时 | ✅ |
+| 文档编写 | ✅ 规范变更 | ✅ |
+| 测试编写 | ❌ | ✅ |
+| 架构评审 | ✅ 决策冻结 | ✅ |
+| 性能优化 | ✅ 基线数据 | ✅ |
+| 重构 | ✅ 架构变更 | ✅ |
+| 流程定义 | ✅ 系统行为 | ✅ |
+| 配置变更 | ✅ 长期事实 | ✅ |
+
+### 5.4 Completion Gate
+
+`attempt_completion` **之前**必须确认：
+
+```
+Gate 1: L2 Review Complete    ✅/❌
+Gate 2: L3 Review Complete    ✅/❌
+Gate 3: Receipt Generated     ✅/❌
+
+全部通过 → 允许 attempt_completion
+任一未通过 → 阻断，返回修复
+
+**绝对规则**: 如果上述 Gate 条件未全部通过，Agent 必须暂停并通知用户。禁止在 Gate OPEN 状态下调用 `attempt_completion`。这不是建议，是必须遵守的规则。违反此规则的行为将被视为流程违规。
+```
+
+### 5.5 attempt_completion 格式
+
+每次 `attempt_completion` 的 `result` 必须包含：
+
+```
+Memory Sync:
+  L2: [updated|skipped] — [slots]
+  L3: [updated|skipped] — [sections]
+  Receipt: [generated|skipped]
+  Gate: [CLOSED|OPEN]
+```
+
+### 5.6 Memory Operations
+
+- **L2 写入**: `Governor.write()` → 自动持久化到 `cline-memory.json`
+- **L2 查询**: `Governor.get_active(slot_id)`
+- **L3 更新**: 直接编辑 `PROGRESS.md`
+- **MCP 同步**: 执行 `Governor.write()` 返回的 `commands`
+
+### 5.7 参考文档
+
+- `docs/agent_memory_integration_v1.0.md`（完整流程）
+- `docs/memory_sync_receipt_template.md`（Receipt 模板）
+- `docs/memory_sync_protocol_v1.0.md`（同步协议）
+- `docs/memory_governance_freeze_v1.0.md`（冻结范围）
 
 ## 6. 编码规范红线
 
