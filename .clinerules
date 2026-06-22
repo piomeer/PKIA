@@ -53,8 +53,8 @@
 ## 4. 数据库保护红线
 
 - **L2 图谱层文件**（`cline-memory.json`）：绝对禁止使用普通文本编辑工具格式化、美化或手动编辑
-- **所有 L2 更新** 必须通过 MCP `memory` 服务器的工具（`create_entities`、`create_relations`、`add_observations`、`delete_entities` 等）或 Governor API 进行
-- **L3 进度层**（`PROGRESS.md`）：使用标准 Markdown，可直接编辑
+- **所有 L2 更新** 必须通过 MCP `memory` 服务器的工具或 Governor API 进行
+- **L3 进度层**：使用命名空间化的多文件模型，参见 §5.8
 
 ## 5. Memory Governance（强制流程）
 
@@ -84,10 +84,10 @@ Task → Memory Review → L2 Update(如需) → L3 Update → Receipt → Compl
 #### L3 Review（进度同步检查）
 
 ```
-□ 任务完成？ → 更新 PROGRESS.md「✅ 已完成」
-□ 阶段完成？ → 更新 PROGRESS.md「🎯 当前活动目标」
-□ 阻塞解除？ → 更新 PROGRESS.md「⛔ 已知卡点」
-□ 新阶段启动？ → 更新 PROGRESS.md「🚀 下一步计划」
+□ 任务完成？ → 更新 progress/<namespace>.md「✅ 已完成」
+□ 阶段完成？ → 更新 progress/<namespace>.md「🎯 当前活动目标」
+□ 阻塞解除？ → 更新 progress/<namespace>.md「⛔ 已知卡点」
+□ 新阶段启动？ → 更新 progress/<namespace>.md「🚀 下一步计划」
 ```
 
 ### 5.3 快速判定表
@@ -135,7 +135,7 @@ Memory Sync:
 
 - **L2 写入**: `Governor.write()` → 自动持久化到 `cline-memory.json`
 - **L2 查询**: `Governor.get_active(slot_id)`
-- **L3 更新**: 直接编辑 `PROGRESS.md`
+- **L3 更新**: 编辑 `progress/<namespace>.md`
 - **MCP 同步**: 执行 `Governor.write()` 返回的 `commands`
 
 ### 5.7 参考文档
@@ -144,6 +144,28 @@ Memory Sync:
 - `docs/memory_sync_receipt_template.md`（Receipt 模板）
 - `docs/memory_sync_protocol_v1.0.md`（同步协议）
 - `docs/memory_governance_freeze_v1.0.md`（冻结范围）
+
+### 5.8 L3 Namespace Management
+
+#### 规则
+
+1. L3 不再是单文件 PROGRESS.md。
+2. L3 由 `progress/` 目录下的命名空间文件组成。
+3. 每个 Agent 必须操作且仅操作一个命名空间。
+4. 如果命名空间文件不存在，先创建再开始实现工作。
+5. 禁止将不相关任务的进度写入其他命名空间文件。
+6. `attempt_completion` 前必须更新命名空间进度文件。
+
+#### 命名空间定义
+
+| 命名空间 | 文件 | 用途 |
+|---------|------|------|
+| `workspace` | `progress/workspace.md` | Workspace 级开发管理 |
+| `pkia_mvp` | `progress/pkia_mvp.md` | PKIA MVP 开发进度 |
+| `pkia_memory` | `progress/pkia_memory.md` | Memory 模块进度 |
+| `mukg` | `progress/mukg.md` | MuKG 遗留项目 |
+
+更多信息参见 `docs/l3_namespace_architecture_v1.0.md`。
 
 ## 6. 编码规范红线
 

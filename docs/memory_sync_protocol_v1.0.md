@@ -3,7 +3,7 @@
 > **文档状态**: Architecture Freeze Document  
 > **版本**: 1.0  
 > **更新日期**: 2026-06-21  
-> **用途**: 定义 L2 (cline-memory.json) 与 L3 (PROGRESS.md) 之间的同步机制
+> **用途**: 定义 L2 (cline-memory.json) 与 L3 (progress/<namespace>.md) 之间的同步机制
 
 ---
 
