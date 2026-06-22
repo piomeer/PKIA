@@ -187,6 +187,15 @@ Memory Sync:
 
 更多信息参见 `docs/agent_bootstrap_protocol_v1.0.md`。
 
+### 5.10 Workspace Entry Point
+
+如果 `START_HERE.md` 存在于项目根目录：
+
+1. Agent 应在命名空间解析之前读取 `START_HERE.md`
+2. `START_HERE.md` 是所有未来 Agent 的推荐入口点
+
+此规则不修改 Bootstrap Protocol 逻辑，仅添加入口点指引。
+
 ## 6. 编码规范红线
 
 - 禁止使用 `print()` — 必须使用 `logger = logging.getLogger(__name__)`
