@@ -114,6 +114,50 @@ Rule 6: attempt_completion 的 result 中必须包含同步摘要
 
 ---
 
+## 3.5 Completion Gate
+
+任务结束前必须满足以下三个条件，否则禁止 `attempt_completion`：
+
+### Gate Conditions
+
+```
+Gate 1: L2 Review Complete
+  → 架构决策变更 → Governor.write() 执行
+  → 规范变更 → Governor.write() 执行
+  → 长期事实变更 → Governor.write() 执行
+  → 无变更 → 跳过
+
+Gate 2: L3 Review Complete
+  → PROGRESS.md 更新
+  → 与当前任务状态一致
+
+Gate 3: Receipt Generated
+  → docs/memory_sync_receipts/YYYY-MM-DD_task_receipt.md 存在
+  → Checklist 全部通过
+  → Verification 全部通过
+```
+
+### Gate Violation
+
+| 违规 | 后果 |
+|------|------|
+| Gate 1 未通过 | L2 同步缺失，架构决策不可恢复 |
+| Gate 2 未通过 | L3 进度漂移，上下文碎片化 |
+| Gate 3 未通过 | 无审计证据，视为流程违规 |
+
+### Gate Summary
+
+```
+Memory Sync:
+  L2: [updated|skipped]
+  L3: [updated|skipped]
+  Receipt: [generated|skipped]
+  Checklist: [PASS|FAIL]
+  Gate: [OPEN|CLOSED]
+```
+
+---
+
 ## 4. 执行摘要格式
 
 每次 `attempt_completion` 的 `result` 中必须包含以下同步摘要：

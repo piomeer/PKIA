@@ -375,6 +375,63 @@ Agent
 
 ## 8. 附录：同步示例
 
+---
+
+## 9. Memory Sync Audit
+
+### 9.1 审计层定义
+
+Memory Sync Audit 是独立的**审计层**，不属于记忆层（L2）、Governor 或 Persistence。
+
+| 属性 | 值 |
+|------|-----|
+| 层定位 | Audit Layer |
+| 依赖 | 无代码依赖 |
+| 存储 | Markdown Receipt 文件 |
+| 数据流 | Task → Review → L2 Update → L3 Update → **Receipt Generation** → Completion |
+
+### 9.2 完整流程
+
+```
+Task
+  ↓
+Review (L2 + L3 Checklist)
+  ↓
+L2 Update (Governor.write() → cline-memory.json)
+  ↓
+L3 Update (PROGRESS.md)
+  ↓
+Receipt Generation (docs/memory_sync_receipts/YYYY-MM-DD_task_receipt.md)
+  ↓
+Completion (attempt_completion with sync summary)
+```
+
+### 9.3 Receipt 文件
+
+Receipt 存储在 `docs/memory_sync_receipts/` 目录中，每个任务一个文件。
+
+命名格式: `YYYY-MM-DD_taskname_receipt.md`
+
+Receipt 模板参见 `docs/memory_sync_receipt_template.md`。
+
+### 9.4 审计规则
+
+| 规则 | 说明 |
+|------|------|
+| 每个任务至多一个 Receipt | 多个子任务可合并 |
+| Receipt 必须在 attempt_completion 前生成 | 保证凭证完整性 |
+| Receipt 一经生成不得修改 | Append-only |
+| 缺失 Receipt = 同步未完成 | 审计断点 |
+
+### 9.5 不审计范围
+
+- Governor 内部算法
+- MCP 内部实现
+- Git 操作
+- Conflict Resolution 结果
+
+完整定义参见 `docs/memory_sync_audit_v1.0.md`。
+
 ### 示例 1: 实现一个规范文档
 
 ```
