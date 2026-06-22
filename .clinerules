@@ -167,6 +167,26 @@ Memory Sync:
 
 更多信息参见 `docs/l3_namespace_architecture_v1.0.md`。
 
+### 5.9 Agent Bootstrap Protocol
+
+#### Bootstrapping (强制流程)
+
+在开始实现工作 **之前**，必须执行以下步骤：
+
+1. **确定命名空间**（workspace / pkia_mvp / pkia_memory / mukg）
+2. **加载命名空间进度文件** `progress/<namespace>.md`（如缺失则创建）
+3. **审查相关 L2 记忆**（Governor.get_active 获取架构决策）
+4. **生成 Bootstrap Summary**（包含命名空间、阶段、活跃任务、阻塞）
+5. **开始实现工作**
+
+#### 规则
+
+- Bootstrap 完成前不得开始实现工作。
+- 如果命名空间无法确定，默认使用 `workspace`。
+- 如果进度文件缺失，使用标准模板创建。
+
+更多信息参见 `docs/agent_bootstrap_protocol_v1.0.md`。
+
 ## 6. 编码规范红线
 
 - 禁止使用 `print()` — 必须使用 `logger = logging.getLogger(__name__)`

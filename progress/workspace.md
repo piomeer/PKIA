@@ -21,6 +21,7 @@
 ## Completed Tasks
 - ✅ L3 Namespace Architecture Migration v1.0
 - ✅ Legacy PROGRESS.md retired
+- ✅ Agent Bootstrap Protocol v1.0
 - ✅ Memory Governance Freeze v1.0
 - ✅ Memory Governance Deployment v1.0
 - ✅ Memory Sync Protocol v1.0 + Enforcement + Audit
