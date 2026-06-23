@@ -184,8 +184,12 @@ Memory Sync:
 - Bootstrap 完成前不得开始实现工作。
 - 如果命名空间无法确定，默认使用 `workspace`。
 - 如果进度文件缺失，使用标准模板创建。
+- Bootstrap 必须提取以下信息，缺失则视为 **FAILED**：
+  - Relevant L2 Memories（架构决策和项目事实）
+  - Working Context（ACTIVE 决策的可读摘要）
+  - Current Constraints（冻结规则和限制）
 
-更多信息参见 `docs/agent_bootstrap_protocol_v1.0.md`。
+更多信息参见 `docs/bootstrap_protocol_v1.1.md`。
 
 ### 5.10 Workspace Entry Point
 

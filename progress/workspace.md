@@ -7,9 +7,7 @@
 ---
 
 ## Current Phase
-**L3 Namespace Architecture Migration — Complete**
-
-单文件 PROGRESS.md 已退役，命名空间模型已激活。
+**Memory Governance — Feature Complete, Frozen**
 
 ---
 
@@ -19,10 +17,11 @@
 ---
 
 ## Completed Tasks
+- ✅ Bootstrap Protocol v1.1 — Enhanced L2 extraction + Working Context + Integrity check
+- ✅ Workspace Entry Point v1.0 (START_HERE.md)
+- ✅ Agent Bootstrap Protocol v1.0
 - ✅ L3 Namespace Architecture Migration v1.0
 - ✅ Legacy PROGRESS.md retired
-- ✅ Agent Bootstrap Protocol v1.0
-- ✅ Workspace Entry Point v1.0 (START_HERE.md)
 - ✅ Memory Governance Freeze v1.0
 - ✅ Memory Governance Deployment v1.0
 - ✅ Memory Sync Protocol v1.0 + Enforcement + Audit
@@ -33,10 +32,71 @@
 
 ---
 
-## L2 同步记录
-- `architecture:l3_storage_model@global` = `Namespace_Based`
-- `architecture:l3_namespace_strategy@global` = `One_Task_One_File`
-- `architecture:l3_progress_root@global` = `progress/`
+## Relevant L2 Memories
+
+| Slot | Value |
+|------|-------|
+| `architecture:agent_bootstrap_protocol@global` | `Enabled_v1.0` |
+| `architecture:agent_startup_flow@global` | `Namespace_L2_L3_Bootstrap` |
+| `architecture:workspace_entrypoint@global` | `START_HERE_v1.0` |
+| `architecture:l3_storage_model@global` | `Namespace_Based` |
+| `architecture:l3_namespace_strategy@global` | `One_Task_One_File` |
+| `architecture:l3_progress_root@global` | `progress/` |
+| `architecture:l3_legacy_progress_file@global` | `Retired` |
+| `architecture:memory_governance_status@global` | `Feature_Complete_v1.0` |
+| `architecture:memory_architecture@global` | `Dual_Graph_Model` |
+| `architecture:memory_synchronization@global` | `Enabled_v1.0` |
+| `architecture:memory_sync_enforcement@global` | `Enabled_v1.0` |
+| `architecture:memory_timestamp_extension@global` | `Enabled_v1.0` |
+| `architecture:governance_deployment_status@global` | `Partially_Deployed` |
+| `project:user_memory_file@global` | `pkia-user-memory.json` |
+| `project:workspace_memory_file@global` | `cline-memory.json` |
+
+---
+
+## Active Decisions
+
+- **Memory Governance**: Feature Complete, Frozen — 禁止 Event Sourcing、Transaction Log、Memory Decay、Governor Rewrite、Ontology Rewrite
+- **L3 Storage**: Namespace-based multi-file model (`progress/`), single PROGRESS.md retired
+- **Bootstrap**: v1.1 enhanced — requires Relevant L2 Memories + Working Context + Current Constraints, FAILED if missing
+- **Entry Point**: `START_HERE.md` is the recommended first read for all new agents
+- **Persistence**: Governor writes directly to `cline-memory.json`, MCP is ephemeral query layer only
+- **Conflict Resolution**: USER_EXPLICIT > AGENT_INFERRED > confidence > timestamp > reinforcement_count
+- **Governance Deployment**: Partially Deployed — documentation and code layers deployed, execution layer pending pre-completion enforcement
+
+---
+
+## Current Constraints
+
+- **Governance Freeze Active**: Ontology / Schema / Governor / Persistence / Sync / Enforcement / Audit — all frozen
+- **No Governor core logic modification allowed**
+- **No Event Sourcing or Transaction Log**
+- **No Ontology or Schema rewrite**
+- **No Memory Heat / Ranking / Summary / Decay**
+- **MuKG remnants present in MCP memory (not migrated)**
+- **Bouncer script (utils/memory_bouncer.py) not yet created**
+- **MCP is pure in-memory — all writes must go through Governor which persists to file**
+
+---
+
+## Working Context
+
+```
+System State: Workspace Memory Governance Feature Complete — Frozen
+Active Governance: Frozen (Event Sourcing / Transaction Log / Decay / Governor Rewrite / Ontology Rewrite 禁止)
+Key Architecture Decisions:
+  - L3 uses namespace-scoped files (progress/) instead of single PROGRESS.md
+  - Governor reads from cline-memory.json directly, MCP is ephemeral query layer only
+  - Conflict Resolution: USER_EXPLICIT > AGENT_INFERRED > confidence > time > reinforcement_count
+  - Bootstrap Protocol v1.1: requires L2 memories + Working Context + Constraints, FAILED if missing
+  - START_HERE.md is entry point for all new agents
+Current Phase: Memory Governance — Feature Complete, Frozen
+Constraints:
+  - Governance Freeze: 10 components frozen
+  - No Governor core logic modification
+  - No Event Sourcing or Transaction Log
+  - No Ontology or Schema rewrite
+```
 
 ---
 
@@ -51,4 +111,4 @@
 
 ---
 
-*最后更新: 2026-06-22 23:24 JST*
+*最后更新: 2026-06-23 21:07 JST*
