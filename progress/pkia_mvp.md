@@ -14,7 +14,8 @@ PKIA MVP Development Agent has bootstrapped and is ready to receive implementati
 ---
 
 ## Active Tasks
-- 等待用户下达 PKIA MVP 实现指令
+- Scoring Pipeline v2 创建完成
+- 等待下一指令
 
 ---
 
@@ -44,4 +45,4 @@ PKIA MVP Development Agent has bootstrapped and is ready to receive implementati
 
 ---
 
-*最后更新: 2026-06-23 00:19 JST*
+*最后更新: 2026-06-23 20:31 JST*
