@@ -5,7 +5,7 @@ The Governor sits between the Agent (caller) and the MCP Memory Server
 (ephemeral query layer).  It maintains in-memory Slot + Relation indexes
 so that all reads are served from memory (fast, no MCP calls).
 
-Persistence is handled by writing directly to ``cline-memory.json``
+Persistence is handled by writing directly to ``cursor-memory.json``
 (Append-only JSON Lines format), NOT by relying on MCP's in-memory state.
 
 Architecture::
@@ -18,7 +18,7 @@ Architecture::
         ├── RelationIndex       (in-memory: from→to bidirectional)
         └── memory_service      (JSON Lines bootstrap + file append + MCP builder)
         │
-        ├── cline-memory.json  (file: Source of Truth, append-only)
+        ├── cursor-memory.json  (file: Source of Truth, append-only)
         └── MCP Memory Server (ephemeral: query interface, rebuilt on restart)
 
 Lifecycle::
@@ -67,7 +67,7 @@ class Governor:
     Usage::
 
         gov = Governor()
-        gov.startup("cline-memory.json")
+        gov.startup("cursor-memory.json")
 
         # Read
         node = gov.get_active("preference:response_language@global")
@@ -212,7 +212,7 @@ class Governor:
 
             2. Update in-memory indexes (immediately visible).
 
-            3. Append to cline-memory.json (durable, append-only).
+            3. Append to cursor-memory.json (durable, append-only).
 
             4. Return MCP commands (sync to MCP memory for query).
         """

@@ -1,5 +1,18 @@
 # PKIA Scoring Pipeline Schema v1
 
+> **⚠️ DEPRECATED — 此文档已被 `scoring_pipeline_schema_v2.md` 取代**
+>
+> 本文件保留为历史参考。v2 修复了审查发现的所有 10 个 P0 一致性问题，包括：
+> - 缺少 `project_id` 和 `pipeline_status` 字段
+> - 中文字段名（5 处）
+> - Stage 2 包含分类字段（Stage 边界违规）
+> - 缺少 `classification_confidence`、`reasoning`、`career_goal_impact` 等字段
+> - 未引用 `project_data_schema_v1.md` 作为数据契约
+>
+> **所有新实现请引用 `docs/scoring_pipeline_schema_v2.md`。**
+>
+> 迁移说明参见 `docs/scoring_pipeline_patch_plan_v1.md`。
+
 ---
 
 ## 1. Purpose

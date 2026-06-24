@@ -7,7 +7,7 @@
 ---
 
 ## Current Phase
-**Memory Governance — Feature Complete, Frozen**
+**Memory Governance — Feature Complete, Cursor Migration Aligned**
 
 ---
 
@@ -29,6 +29,8 @@
 - ✅ Governor MVP v0.1 (5 模块, 30 测试)
 - ✅ Memory Ownership Refactor
 - ✅ Memory Backend Cutover
+- ✅ Cursor Migration Alignment (2026-06-24) — 更新 L2 slot、文档引用、MCP 描述
+- ✅ utils/memory_bouncer.py 创建并验证 — 门禁脚本执行载体就绪
 
 ---
 
@@ -50,7 +52,7 @@
 | `architecture:memory_timestamp_extension@global` | `Enabled_v1.0` |
 | `architecture:governance_deployment_status@global` | `Partially_Deployed` |
 | `project:user_memory_file@global` | `pkia-user-memory.json` |
-| `project:workspace_memory_file@global` | `cline-memory.json` |
+| `project:workspace_memory_file@global` | `cursor-memory.json` |
 
 ---
 
@@ -60,7 +62,7 @@
 - **L3 Storage**: Namespace-based multi-file model (`progress/`), single PROGRESS.md retired
 - **Bootstrap**: v1.1 enhanced — requires Relevant L2 Memories + Working Context + Current Constraints, FAILED if missing
 - **Entry Point**: `START_HERE.md` is the recommended first read for all new agents
-- **Persistence**: Governor writes directly to `cline-memory.json`, MCP is ephemeral query layer only
+- **Persistence**: Governor writes directly to `cursor-memory.json`, MCP is ephemeral query layer only
 - **Conflict Resolution**: USER_EXPLICIT > AGENT_INFERRED > confidence > timestamp > reinforcement_count
 - **Governance Deployment**: Partially Deployed — documentation and code layers deployed, execution layer pending pre-completion enforcement
 
@@ -74,7 +76,7 @@
 - **No Ontology or Schema rewrite**
 - **No Memory Heat / Ranking / Summary / Decay**
 - **MuKG remnants present in MCP memory (not migrated)**
-- **Bouncer script (utils/memory_bouncer.py) not yet created**
+- **Bouncer script (utils/memory_bouncer.py) — 已创建并验证**
 - **MCP is pure in-memory — all writes must go through Governor which persists to file**
 
 ---
@@ -86,7 +88,7 @@ System State: Workspace Memory Governance Feature Complete — Frozen
 Active Governance: Frozen (Event Sourcing / Transaction Log / Decay / Governor Rewrite / Ontology Rewrite 禁止)
 Key Architecture Decisions:
   - L3 uses namespace-scoped files (progress/) instead of single PROGRESS.md
-  - Governor reads from cline-memory.json directly, MCP is ephemeral query layer only
+  - Governor reads from cursor-memory.json directly, MCP is ephemeral query layer only
   - Conflict Resolution: USER_EXPLICIT > AGENT_INFERRED > confidence > time > reinforcement_count
   - Bootstrap Protocol v1.1: requires L2 memories + Working Context + Constraints, FAILED if missing
   - START_HERE.md is entry point for all new agents
@@ -101,8 +103,8 @@ Constraints:
 ---
 
 ## Blockers
-- 门禁脚本 `utils/memory_bouncer.py` 尚未创建
-- 残留 MuKG 孤立实体
+- 残留 MuKG 孤立实体（待确认是否清理）
+- Bouncer 脚本尚未集成至 pre-completion hook（需人工确认集成方式）
 
 ---
 
@@ -111,4 +113,4 @@ Constraints:
 
 ---
 
-*最后更新: 2026-06-23 21:07 JST*
+*最后更新: 2026-06-24 21:51 JST*

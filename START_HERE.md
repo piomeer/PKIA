@@ -11,7 +11,7 @@ This file is the first entry point for any new Cline Agent.
 
 Before performing implementation work:
 
-1. Read `.clinerules`
+1. Read `.cursorrules`
 2. Execute Agent Bootstrap Protocol
 3. Determine namespace
 4. Load namespace progress file
@@ -25,10 +25,10 @@ Before performing implementation work:
 
 ```
 L1  — 宪法层
-   .clinerules
+   .cursorrules
 
 L2  — 图谱层
-   cline-memory.json
+   cursor-memory.json
    pkia_memory/ (Governor API)
 
 L3  — 进度层
@@ -52,7 +52,7 @@ L3  — 进度层
 
 | Document | Purpose |
 |----------|---------|
-| `docs/agent_bootstrap_protocol_v1.0.md` | Bootstrap 生命周期定义 |
+| `docs/bootstrap_protocol_v1.1.md` | Bootstrap 生命周期定义（v1.1 增强版） |
 | `docs/memory_sync_protocol_v1.0.md` | L2 ↔ L3 同步机制 |
 | `docs/memory_sync_enforcement_v1.0.md` | 强制执行规则 + Completion Gate |
 | `docs/memory_sync_audit_v1.0.md` | 证据链 + Receipt 机制 |
@@ -64,4 +64,4 @@ L3  — 进度层
 
 ## New Agent Startup Command
 
-Read this file, then execute Agent Bootstrap Protocol v1.0 before starting work.
+Read this file, then execute Agent Bootstrap Protocol v1.1 before starting work.

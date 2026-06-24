@@ -17,10 +17,9 @@ Daily Report 是 PKIA 的核心输出。
 
 ## 2. Input Sources
 
-v0.1 仅包含：
+v0.1 包含：
 
-- **GitHub Trending** — 每日热门开源项目
-- **Arxiv** — 每日新论文（可配置分类：cs.AI, cs.CL, cs.LG 等）
+- **GitHub Trending** — 每日热门开源项目（Top 30）
 
 ---
 
@@ -41,17 +40,17 @@ v0.1 仅包含：
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 • 新项目（GitHub Trending）:  N 个
-• 新论文（Arxiv）:             N 篇
 • 🔴 Strong Recommend:        N 项
 • 🟡 Recommend:                N 项
 • ⚪ Observe:                  N 项
+• ⚫ Ignore:                   N 项
 ```
 
 ---
 
 ### Section B: 🔴 Strong Recommend
 
-强烈推荐层。展示评分 90+ 的项目和论文。
+强烈推荐层。展示评分 90+ 的项目。
 
 每项包含：
 
@@ -62,8 +61,14 @@ v0.1 仅包含：
 
 项目名:     [name]
 分类:       [category]
-来源:       [GitHub Trending | Arxiv]
+来源:       GitHub Trending
 总分:       [score]
+
+职业目标影响:
+  Agent Application Engineer:        [HIGH / MEDIUM / LOW]
+  AI Platform Engineer:              [HIGH / MEDIUM / LOW]
+  LLM Inference Optimization Engineer: [HIGH / MEDIUM / LOW]
+  Multi-Agent System Engineer:       [HIGH / MEDIUM / LOW]
 
 推荐理由:
 [why this project matters to the user]
@@ -78,7 +83,7 @@ v0.1 仅包含：
 
 ### Section C: 🟡 Recommend
 
-推荐层。展示评分 70–89 的项目和论文。
+推荐层。展示评分 70–89 的项目。
 
 每项包含：
 
@@ -89,7 +94,7 @@ v0.1 仅包含：
 
 项目名:     [name]
 分类:       [category]
-来源:       [GitHub Trending | Arxiv]
+来源:       GitHub Trending
 总分:       [score]
 
 推荐理由:
@@ -100,7 +105,7 @@ v0.1 仅包含：
 
 ### Section D: ⚪ Observe
 
-观察层。展示评分 40–69 的项目和论文。
+观察层。展示评分 40–69 的项目。
 
 每项包含：
 
@@ -111,7 +116,7 @@ v0.1 仅包含：
 
 项目名:     [name]
 分类:       [category]
-来源:       [GitHub Trending | Arxiv]
+来源:       GitHub Trending
 总分:       [score]
 
 说明:
@@ -200,10 +205,10 @@ Priority #3: [项目名]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 • 新项目（GitHub Trending）:  24 个
-• 新论文（Arxiv）:             18 篇
 • 🔴 Strong Recommend:         3 项
 • 🟡 Recommend:                 4 项
 • ⚪ Observe:                   6 项
+• ⚫ Ignore:                   11 项
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -214,6 +219,12 @@ Priority #3: [项目名]
 分类:       Agent Framework
 来源:       GitHub Trending
 总分:       96
+
+职业目标影响:
+  Agent Application Engineer:        HIGH
+  AI Platform Engineer:              MEDIUM
+  LLM Inference Optimization Engineer: LOW
+  Multi-Agent System Engineer:       MEDIUM
 
 推荐理由:
 社区最受关注的 Agent 框架之一，深度集成了 Tool Use、
@@ -235,6 +246,12 @@ Planning 和 Autonomous Execution 能力，代表了 Agent
 分类:       Agent Memory
 来源:       GitHub Trending
 总分:       98
+
+职业目标影响:
+  Agent Application Engineer:        HIGH
+  AI Platform Engineer:              MEDIUM
+  LLM Inference Optimization Engineer: LOW
+  Multi-Agent System Engineer:       HIGH
 
 推荐理由:
 Agent Memory 是 Agent 从无状态工具进化为有状态助手的
@@ -297,7 +314,7 @@ RAG 成熟框架，功能稳定但已过快速创新期，按需查阅即可。
 
 项目名:     PyTorch Geometric
 分类:       Knowledge Graph / Graph ML
-来源:       Arxiv
+来源:       GitHub Trending
 总分:       38
 
 说明:

@@ -7,25 +7,37 @@
 ---
 
 ## Current Phase
-**Bootstrapped — Awaiting Implementation Commands**
+**Phase 0: 文档收尾 — 已完成**
 
-PKIA MVP Development Agent has bootstrapped and is ready to receive implementation tasks.
+P0 文档补丁全部完成，PKIA MVP 进入 Phase 1 就绪状态。
 
 ---
 
 ## Active Tasks
-- Scoring Pipeline v2 创建完成
-- 等待下一指令
+- 等待 Phase 1 实现指令
 
 ---
 
 ## Completed Tasks
+
+### Phase 0: 文档收尾（2026-06-24）
+
+| 任务 | 状态 | 说明 |
+|------|------|------|
+| P0-1: report_generation_pipeline_v1.md Schema 补丁 | ✅ 完成 | 添加 `project_id`, `pipeline_status`, `career_goal_impact`；修复文档引用（v1 → v2）；Section B 展示添加职业目标影响字段；排序键添加 `project_id` 确定性键 |
+| P0-2: daily_report_spec_v1.md Career Goal Impact 展示补丁 | ✅ 完成 | Section B 展示添加结构化职业目标影响；Section A 移除 Arxiv 统计行；移除所有 Arxiv 引用；添加 Ignore 统计行 |
+| P0-3: scoring_pipeline_schema_v1.md 标记 DEPRECATED | ✅ 完成 | 添加 DEPRECATED 标志，指向 v2 作为替代 |
+| P0-4: L2 图谱补充 PKIA 文档实体 | ✅ 完成 | 新增 8 个实体 + 7 条关系（PKIA_v0.1_PRD, Project_Data_Schema_v1, Scoring_Pipeline_Schema_v2, Classification_Taxonomy_v1, Career_Goal_Profile, Interest_Tier S/A/B） |
+| P0-5: L3 进度文件更新 | ✅ 完成 | 本文件 |
+
+### 此前完成
+
 - L2 Memory System 已就绪
 - Governor MVP v0.1 已验证 (23/23 测试通过)
 - 持久化层已部署
 - Memory Sync 已部署
-- PKIA 文档体系已完成（8 份核心文档 + 5 份审查/补丁文档）
-- Schema 一致性审查已完成（classification_agent_spec ✅, prompt_scoring_agent ✅, scoring_pipeline ✅）
+- PKIA 文档体系已完成（23 份文档）
+- Schema 一致性审查全部通过
 
 ---
 
@@ -41,6 +53,7 @@ PKIA MVP Development Agent has bootstrapped and is ready to receive implementati
 - **Three-Tier Memory System** (ACTIVE): L1 Constitution → L2 Knowledge Graph → L3 Progress, as PKIA state management infrastructure
 - **PKIA on Dify Platform** (ACTIVE): Uses Dify Backend (Python Flask) + Dify Frontend (Next.js/React) as implementation platform
 - **Memory Governance Frozen** (ACTIVE): Ontology, Schema, Governor, Persistence, Sync components are feature-complete and frozen
+- **Phase 1 实施路线** (ACTIVE): 1A-2B-3C-4A（先补文档 + Python 采集 + Dify Workflow 处理 + Markdown 日报 + GitHub Only）
 
 ## Current Constraints
 
@@ -52,50 +65,30 @@ PKIA MVP Development Agent has bootstrapped and is ready to receive implementati
 
 ## Working Context
 
-- **System State**: PKIA Project bootstrapped on Dify Platform with Three-Tier Memory System
-- **Active Governance**: Memory Governance FROZEN (Event Sourcing / Transaction Log / Memory Heat / Memory Ranking / Memory Summary / Memory Decay 禁止)
+- **System State**: PKIA Phase 0 complete, ready for Phase 1 implementation
+- **Active Governance**: Memory Governance FROZEN
 - **Key Architecture Decisions**:
-  - Scoring Pipeline v2 已创建，可直接用于 F4(每日推荐报告) 和 F5(推荐理由生成)
-  - PKIA v0.1 PRD 定义 6 个 MVP 功能：F1-Arxiv 抓取, F2-GitHub Trending 抓取, F3-兴趣标注, F4-每日推荐报告, F5-推荐理由生成, F6-历史回顾
-  - F4/F5 依赖 F1/F2 (数据来源) 和 F3 (兴趣标注)
-  - F6 依赖 F3 (标注数据)
-- **Current Phase**: PKIA MVP — Bootstrapped, Awaiting Implementation Commands
-
----
+  - Scoring Pipeline v2 已创建，可直接用于 F4/F5
+  - PKIA v0.1 PRD 定义 6 个 MVP 功能，但 v0.1 实现范围以 data_collection_strategy_v1.md 为准（仅 GitHub）
+  - 实现载体：Python 脚本采集 + Dify Workflow 处理
+  - 日报交付：Markdown 文件（`pkia/reports/YYYY-MM-DD.md`）
+- **L2 图谱最新**: 8 个 PKIA 文档实体 + 7 条关系已同步
 
 ## Blockers
 
-- 等待用户指定 PKIA MVP 第一个实现目标
-
----
+- 等待用户指定 Phase 1 第一个实现目标
 
 ## Next Steps
 
-根据 PKIA v0.1 PRD，MVP Phase 1 建议按依赖链分步实施：
+Phase 1 建议按依赖链实施：
 
-1. **F1 + F2 (数据采集层)** — Arxiv + GitHub Trending 每日抓取模块
-2. **F3 (兴趣标注系统)** — 用户标注: 兴趣 / 待深度阅读 / 已读 / 不感兴趣
-3. **F4 + F5 (推荐引擎)** — 每日推荐报告 + 推荐理由生成（复用 Scoring Pipeline v2）
-4. **F6 (历史回顾)** — 标注查询与回顾
+1. **GitHub Trending Collector** — Python 脚本，抓取 Top 30，生成 `project_id`
+2. **Project Normalizer** — 清洗 description、提取 keywords
+3. **Dify Workflow 骨架** — Stage 1→2→3 数据流
+4. **Classification Agent** — Dify LLM Node
+5. **Scoring Agent v2** — Dify LLM Node
+6. **Daily Report 文本输出** — Markdown 格式
 
 ---
 
-*最后更新: 2026-06-24 00:00 JST*
-</content_use_mcp_tool>
-<server_name>memory</server_name>
-<tool_name>add_observations</tool_name>
-<arguments>
-{
-  "observations": [
-    {
-      "entityName": "PKIA_Project",
-      "contents": [
-        "PKIA MVP Phase: Bootstrapped, awaiting implementation commands",
-        "Scoring Pipeline v2 created, supports F4(每日推荐报告) and F5(推荐理由生成)",
-        "PKIA v0.1 PRD MVP features: F1-Arxiv抓取, F2-GitHub Trending抓取, F3-兴趣标注, F4-每日推荐报告, F5-推荐理由生成, F6-历史回顾"
-      ]
-    }
-  ]
-}
-</arguments>
-</use_mcp_tool>
+*最后更新: 2026-06-24 22:00 JST*
