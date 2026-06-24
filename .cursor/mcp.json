@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+      "memory": {
+        "disabled": false,
+        "timeout": 60,
+        "type": "stdio",
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-memory",
+          "/home/mahe/dify/cursor-memory.json"
+        ]
+      }
+    }
+  }
