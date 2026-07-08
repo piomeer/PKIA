@@ -1,3 +1,4 @@
+cd dify
 # Governor Test Report — MVP v0.1
 
 > **任务**: P1 Governor Test Suite  
