@@ -76,13 +76,14 @@
 | 文档 | 职责 | 状态 | 前置阅读 |
 |------|------|------|----------|
 | `runtime_document_style_guide_v1.md` | 写作标准：文档结构、命名规范、规则体系 | Active | 1st |
-| `runtime_boundary_v1.md` | 运行时边界：每阶段由哪个组件负责，P-01~P-06 | Approved | 2nd |
-| `runtime_architecture_overview_v1.md` | （本文档）拓扑概览与索引 | Approved | 3rd |
-| `node_mapping_v1.md` | 物理节点映射：Dify 节点类型、子节点决策 (MD-XX) | New | 4th |
-| `data_flow_v1.md` | 数据流：Fat Object 演化、State Machine、Variable Flow、Validation Gates | New | 5th |
-| `node_io_contract_v1.md` | IO 契约：节点输入/输出 Schema、职责边界矩阵 | New | 6th |
-| `failure_handling_v1.md` | 故障处理：Retry、Timeout、Drop、Abort、异常日志 | New | 7th |
-| `deployment_v1.md` | 部署：触发器、环境配置、Storage Adapter、Metrics | New | 8th |
+| `runtime_boundary_v1.md` | 运行时边界：每阶段由哪个组件负责，P-01~P-06 | Active | 2nd |
+| `runtime_architecture_overview_v1.md` | （本文档）拓扑概览与索引 | Active | 3rd |
+| `node_mapping_v1.md` | 物理节点映射：Dify 节点类型、子节点决策 (MD-XX) | Active | 4th |
+| `data_flow_v1.md` | 数据流：Fat Object 演化、State Machine、Variable Flow、Validation Gates | Active | 5th |
+| `node_io_contract_v1.md` | IO 契约：节点输入/输出 Schema、职责边界矩阵 | Active | 6th |
+| `failure_handling_v1.md` | 故障处理：Retry、Timeout、Drop、Abort、异常日志 | Active | 7th |
+| `deployment_v1.md` | 部署：触发器、环境配置、Storage Adapter、Metrics | Active | 8th |
+| `runtime_glossary_v1.md` | 全局术语表：统一 Data States、Flow Concepts、Architecture 概念 | Active | 参考
 
 ### 已废弃文档
 
@@ -113,6 +114,8 @@ node_io_contract_v1.md               (理解每个节点的契约)
 failure_handling_v1.md               (理解异常发生时怎么办)
         ↓
 deployment_v1.md                     (理解如何部署运行)
+        ↓
+runtime_glossary_v1.md               (遇到术语疑问时查阅)
 ```
 
 ---

@@ -48,6 +48,7 @@ docs/runtime/
 ├── node_io_contract_v1.md                             [active]  (IO 契约)
 ├── failure_handling_v1.md                             [active]  (故障处理)
 ├── deployment_v1.md                                   [active]  (部署)
+├── runtime_glossary_v1.md                             [active]  (统一术语表)
 ├── runtime_architecture_and_node_mapping_specification_v1.md [superseded]
 └── Runtime Design v1.0.md                             [superseded]
 ```
@@ -65,6 +66,7 @@ docs/runtime/
 | `node_io_contract_v1.md` | Input/output schema per node, field-level constraints, responsibility matrix | What goes in and out of each node? |
 | `failure_handling_v1.md` | Retry, timeout, drop, abort, fallback, WARNING/ERROR logging | What happens when something fails? |
 | `deployment_v1.md` | Trigger config, environment variables, Storage Adapter spec, metrics, INFO logging | How is the workflow deployed and operated? |
+| `runtime_glossary_v1.md` | Unified terminology across all Runtime documents. Data States, Flow Concepts, Architecture & Control. | What does this term mean? |
 | `Runtime Design v1.0.md` | Superseded predecessor to `runtime_boundary_v1.md`. | — |
 | `runtime_architecture_and_node_mapping_specification_v1.md` | Superseded predecessor to the 7 active documents above. | — |
 
