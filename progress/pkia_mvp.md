@@ -27,6 +27,7 @@ P0 文档补丁全部完成，PKIA MVP v0.1 Baseline 已锁定。
 |------|------|------|
 | Chapter 2 — Runtime Boundary 文档落库 | ✅ 完成 | `docs/runtime/Runtime Design v1.0.md` 已创建。覆盖 Collection → Normalizer → Classification → Scoring → Ranking → Report → Storage 的所有 Runtime 职责划分。引入 Dify First, Python Minimal 原则。Collector 方案待 Node Mapping 验证决定。 |
 | Runtime Document Style Guide 文档创建 | ✅ 完成 | `docs/runtime/runtime_document_style_guide_v1.md` 已创建。定义 Runtime 文档层次结构（7 份文档）、标准文档结构（7 节强制）、命名规范（snake_case）、Runtime 规则约定（R-01~R-05）、交叉引用规则和写作规范。 |
+| Runtime Style Guide 追加 Lifecycle + Rule Numbering | ✅ 完成 | 新增 §6 文档生命周期（Draft→Review→Approved→Frozen）和 §7 运行时核心规则编号规范，替换规范 R-01~R-05 定义。 |
 
 ### Phase 0: 文档收尾（2026-06-24）
 
