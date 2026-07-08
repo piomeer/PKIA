@@ -39,29 +39,34 @@ Runtime documents are the translation layer between specification and code.
 
 ```
 docs/runtime/
-├── runtime_document_style_guide_v1.md     (this file)
-├── runtime_architecture_overview_v1.md     [planned]
-├── runtime_boundary_v1.md                  [active]
-├── node_mapping_v1.md                      [planned]
-├── data_flow_v1.md                         [planned]
-├── node_io_contract_v1.md                  [planned]
-├── failure_handling_v1.md                  [planned]
-└── deployment_v1.md                        [planned]
+├── README.md                                          (minimal redirect)
+├── runtime_architecture_overview_v1.md                [active]  (入口 + 拓扑总图)
+├── runtime_document_style_guide_v1.md                 [active]  (本文档)
+├── runtime_boundary_v1.md                             [active]  (职责边界)
+├── node_mapping_v1.md                                 [active]  (节点映射)
+├── data_flow_v1.md                                    [active]  (数据流)
+├── node_io_contract_v1.md                             [active]  (IO 契约)
+├── failure_handling_v1.md                             [active]  (故障处理)
+├── deployment_v1.md                                   [active]  (部署)
+├── runtime_architecture_and_node_mapping_specification_v1.md [superseded]
+└── Runtime Design v1.0.md                             [superseded]
 ```
 
 ### 2.2 Document Responsibilities
 
 | Document | Responsibility | What It Answers |
 |----------|----------------|------------------|
+| `README.md` | 极简跳转页，指向 `runtime_architecture_overview_v1.md` | 入口在哪？ |
+| `runtime_architecture_overview_v1.md` | 核心拓扑图 + 全系文档索引 + 推荐阅读顺序 | 整体架构是什么？从哪开始读？ |
 | `runtime_document_style_guide_v1.md` | Writing standard for all Runtime documents | How must Runtime documents be written? |
-| `runtime_architecture_overview_v1.md` | High-level runtime architecture map, component inventory, tool selection rationale | What are the runtime components and why were they chosen? |
-| `runtime_boundary_v1.md` | Runtime owner for each pipeline stage, Dify vs Python boundary decisions | Who executes each stage? |
-| `Runtime Design v1.0.md` | Superseded predecessor to `runtime_boundary_v1.md`. Retained for historical reference. | — |
-| `node_mapping_v1.md` | Concrete Dify workflow node types, node parameters, node wiring | Which Dify node type implements each boundary? |
-| `data_flow_v1.md` | Data passing between stages, variable naming, iteration strategy, aggregation points | How does data move through the workflow? |
-| `node_io_contract_v1.md` | Exact input/output schema for each Dify node, JSON structure, field-level validation rules | What exactly goes in and out of each node? |
-| `failure_handling_v1.md` | Retry strategy, fallback logic, error codes, degradation modes | What happens when something fails? |
-| `deployment_v1.md` | Scheduling, triggers, environment setup, storage adapter connection, monitoring | How is the workflow deployed and operated? |
+| `runtime_boundary_v1.md` | Runtime owner for each pipeline stage, Dify vs Python boundary decisions (P-01~P-06) | Who executes each stage? |
+| `node_mapping_v1.md` | Physical Dify node types, sub-node orchestration, mapping decisions (MD-XX) | Which Dify node implements each boundary? |
+| `data_flow_v1.md` | Fat Object evolution, Business State Machine, Variable Flow, Validation Gates | How does data move and transform? |
+| `node_io_contract_v1.md` | Input/output schema per node, field-level constraints, responsibility matrix | What goes in and out of each node? |
+| `failure_handling_v1.md` | Retry, timeout, drop, abort, fallback, WARNING/ERROR logging | What happens when something fails? |
+| `deployment_v1.md` | Trigger config, environment variables, Storage Adapter spec, metrics, INFO logging | How is the workflow deployed and operated? |
+| `Runtime Design v1.0.md` | Superseded predecessor to `runtime_boundary_v1.md`. | — |
+| `runtime_architecture_and_node_mapping_specification_v1.md` | Superseded predecessor to the 7 active documents above. | — |
 
 ### 2.3 No Overlap Rule
 
@@ -337,7 +342,8 @@ Inline commands: backticks. Multi-line code blocks with language declaration:
 | Version | Date | Author | Change Summary |
 |---------|------|--------|----------------|
 | v1 | 2026-07 | PKIA MVP Agent | Initial release. Defines Runtime document hierarchy, standard structure, naming conventions, rule system (R-01~R-05), cross-reference rules, and writing guidelines. |
-| v1.1 | 2026-07 | PKIA MVP Agent | Added §6 Runtime Document Lifecycle (Draft→Review→Approved→Frozen). Added §7 Runtime Rule Numbering with canonical rule registry. Replaced rule definitions with R-01 (Validation Isolation), R-02 (Append-Only Object), R-03 (Fail-Fast Iteration), R-04 (Workflow SSOT), R-05 (Aggregator Anarchy). Renumbered sections §6→§8, §7→§9, §8→§10, §9→§11. |
+| v1.1 | 2026-07 | PKIA MVP Agent | Added §6 Runtime Document Lifecycle (Draft→Review→Approved→Frozen). Added §7 Runtime Rule Numbering with canonical rule registry. Replaced rule definitions with R-01~R-05. Renumbered sections §6→§8, §7→§9, §8→§10, §9→§11. |
+| v1.2 | 2026-07 | PKIA MVP Agent | Refactored document tree to reflect directory-as-architecture model. Added README.md, runtime_architecture_overview_v1.md, node_mapping_v1.md, data_flow_v1.md, node_io_contract_v1.md, failure_handling_v1.md, deployment_v1.md. Marked combined spec as Superseded. Updated responsibilities table. |
 
 ---
 
@@ -353,7 +359,7 @@ Inline commands: backticks. Multi-line code blocks with language declaration:
 
 ---
 
-**Design Note (DN-01):** The legacy file `docs/runtime/Runtime Design v1.0.md` has been superseded by `runtime_boundary_v1.md`. It is retained for historical reference only. The naming has been aligned with the snake_case convention.
+**Design Note (DN-01):** The legacy files `docs/runtime/Runtime Design v1.0.md` and `runtime_architecture_and_node_mapping_specification_v1.md` have been superseded. They are retained for historical reference only. All current development should reference the 7 active documents in the hierarchy above.
 
 ---
 

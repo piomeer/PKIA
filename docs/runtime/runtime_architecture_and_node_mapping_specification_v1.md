@@ -1,7 +1,8 @@
 # PKIA Runtime Architecture & Node Mapping Specification v1
 
 > **Document Type**: Design Decision
-> **Status**: Approved
+> **Status**: Superseded
+> **Superseded By**: `runtime_architecture_overview_v1.md`, `node_mapping_v1.md`, `data_flow_v1.md`, `node_io_contract_v1.md`, `failure_handling_v1.md`, `deployment_v1.md`
 > **Last Updated**: 2026-07
 > **Namespace**: pkia_mvp
 
