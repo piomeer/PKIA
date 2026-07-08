@@ -1,6 +1,7 @@
 # PKIA Runtime Design v1.0
 
-> **Document Status**: Draft (Step 1 Complete)
+> **Document Status**: Superseded
+> **Superseded By**: `runtime_boundary_v1.md`
 > **Last Updated**: 2026-07
 > **Namespace**: pkia_mvp
 

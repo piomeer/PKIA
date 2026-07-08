@@ -14,7 +14,7 @@ P0 文档补丁全部完成，PKIA MVP v0.1 Baseline 已锁定。
 ---
 
 ## Active Tasks
-- **Runtime Document Style Guide**: ✅ 完成
+- **Runtime Boundary 重构**: ✅ 完成
 - **等待下一步**: GitHub Trending Collector 第一版实现 / Node Mapping 设计
 
 ---
@@ -26,6 +26,7 @@ P0 文档补丁全部完成，PKIA MVP v0.1 Baseline 已锁定。
 | 任务 | 状态 | 说明 |
 |------|------|------|
 | Chapter 2 — Runtime Boundary 文档落库 | ✅ 完成 | `docs/runtime/Runtime Design v1.0.md` 已创建。覆盖 Collection → Normalizer → Classification → Scoring → Ranking → Report → Storage 的所有 Runtime 职责划分。引入 Dify First, Python Minimal 原则。Collector 方案待 Node Mapping 验证决定。 |
+| Runtime Boundary 重构 → runtime_boundary_v1.md | ✅ 完成 | `docs/runtime/runtime_boundary_v1.md` 创建，遵循 style guide 标准结构。Collector 决策已锁定 (HTTP→Code)。Principles 合并为 P-01~P-06。Runtime Rules 引用 R-01~R-05。旧文档标记为 Superseded。大小: 467→~220 行。 |
 | Runtime Document Style Guide 文档创建 | ✅ 完成 | `docs/runtime/runtime_document_style_guide_v1.md` 已创建。定义 Runtime 文档层次结构（7 份文档）、标准文档结构（7 节强制）、命名规范（snake_case）、Runtime 规则约定（R-01~R-05）、交叉引用规则和写作规范。 |
 | Runtime Style Guide 追加 Lifecycle + Rule Numbering | ✅ 完成 | 新增 §6 文档生命周期（Draft→Review→Approved→Frozen）和 §7 运行时核心规则编号规范，替换规范 R-01~R-05 定义。 |
 
@@ -64,7 +65,7 @@ P0 文档补丁全部完成，PKIA MVP v0.1 Baseline 已锁定。
 - **PKIA on Dify Platform** (ACTIVE): Dify Backend (Python Flask) + Dify Frontend (Next.js/React)
 - **Memory Governance Frozen** (ACTIVE): Ontology, Schema, Governor, Persistence, Sync components frozen
 - **Phase 1 实施路线** (ACTIVE): 1A-2B-3C-4A（先补文档 + Python 采集 + Dify Workflow 处理 + Markdown 日报 + GitHub Only）
-- **Runtime Design v1.0** (ACTIVE): Dify First, Python Minimal. Ranking/Report 由 Dify Code/Template Node 完成, Storage Adapter Pattern 解耦
+- **Runtime Boundary v1** (ACTIVE): `runtime_boundary_v1.md`. Collector finalized (HTTP→Code). Principles P-01~P-06. Rules R-01~R-05.
 - **Runtime Document Style Guide v1** (ACTIVE): snake_case 命名, 7 节强制结构, R-01~R-05 初始规则
 - **PKIA v0.1 Baseline** (ACTIVE): 13 Frozen Documents, Success Criteria defined, Excluded Features documented
 
@@ -78,8 +79,8 @@ P0 文档补丁全部完成，PKIA MVP v0.1 Baseline 已锁定。
 
 ## Working Context
 
-- **System State**: PKIA Phase 1 — Runtime Design v1.0 doc capture + Style Guide complete, ready for Collector implementation
-- **Runtime Design State**: `docs/runtime/Runtime Design v1.0.md` created — boundaries for all 10 Pipeline stages + Report + Storage defined
+- **System State**: PKIA Phase 1 — Runtime Boundary v1 + Style Guide complete, ready for Collector implementation
+- **Runtime Boundary State**: `docs/runtime/runtime_boundary_v1.md` (Approved). Predecessor `Runtime Design v1.0.md` (Superseded).
 - **Runtime Style Guide State**: `docs/runtime/runtime_document_style_guide_v1.md` created — 7-doc hierarchy, writing standard for all future Runtime documents
 - **Active Governance**: Memory Governance FROZEN + Baseline FROZEN
 - **Key Architecture Decisions**:
@@ -91,7 +92,7 @@ P0 文档补丁全部完成，PKIA MVP v0.1 Baseline 已锁定。
 
 ## Blockers
 
-- 等待用户指定 Phase 1 下一个实现目标（Collector 实现 / runtime_boundary 重命名 / Node Mapping 设计）
+- 等待用户指定 Phase 1 下一个实现目标（Collector 实现 / Node Mapping 设计）
 
 ## Next Steps
 

@@ -41,7 +41,7 @@ Runtime documents are the translation layer between specification and code.
 docs/runtime/
 ├── runtime_document_style_guide_v1.md     (this file)
 ├── runtime_architecture_overview_v1.md     [planned]
-├── runtime_boundary_v1.md                  [draft: Runtime Design v1.0]
+├── runtime_boundary_v1.md                  [active]
 ├── node_mapping_v1.md                      [planned]
 ├── data_flow_v1.md                         [planned]
 ├── node_io_contract_v1.md                  [planned]
@@ -56,6 +56,7 @@ docs/runtime/
 | `runtime_document_style_guide_v1.md` | Writing standard for all Runtime documents | How must Runtime documents be written? |
 | `runtime_architecture_overview_v1.md` | High-level runtime architecture map, component inventory, tool selection rationale | What are the runtime components and why were they chosen? |
 | `runtime_boundary_v1.md` | Runtime owner for each pipeline stage, Dify vs Python boundary decisions | Who executes each stage? |
+| `Runtime Design v1.0.md` | Superseded predecessor to `runtime_boundary_v1.md`. Retained for historical reference. | — |
 | `node_mapping_v1.md` | Concrete Dify workflow node types, node parameters, node wiring | Which Dify node type implements each boundary? |
 | `data_flow_v1.md` | Data passing between stages, variable naming, iteration strategy, aggregation points | How does data move through the workflow? |
 | `node_io_contract_v1.md` | Exact input/output schema for each Dify node, JSON structure, field-level validation rules | What exactly goes in and out of each node? |
@@ -352,7 +353,7 @@ Inline commands: backticks. Multi-line code blocks with language declaration:
 
 ---
 
-**Design Note (DN-01):** The existing file `docs/runtime/Runtime Design v1.0.md` uses a naming convention (`PascalCase with spaces and a dot version`) that differs from this style guide's snake_case standard (`runtime_boundary_v1.md`). This is acknowledged as a legacy naming artifact. The file content is compatible with the Runtime document hierarchy (it covers the `runtime_boundary_v1.md` slot). The naming will be aligned in a future cleanup pass. No frozen documents are affected.
+**Design Note (DN-01):** The legacy file `docs/runtime/Runtime Design v1.0.md` has been superseded by `runtime_boundary_v1.md`. It is retained for historical reference only. The naming has been aligned with the snake_case convention.
 
 ---
 
