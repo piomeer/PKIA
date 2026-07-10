@@ -249,3 +249,7 @@ scripts/stress-test/reports/
 .qoder/*
 
 .eslintcache
+
+/pkia_project/
+
+.env
