@@ -30,10 +30,12 @@ class DifyRunner:
         # Dify Start Node 约定的入参变量名为 "projects"
         logger.info("=== 阶段 2: 组装 Dify Payload ===")
         projects_data = [p.model_dump(mode='json') for p in projects]
+        batch_id = projects[0].batch_id if projects else "UNKNOWN_BATCH"
         
         payload = {
             "inputs": {
-                "projects": projects_data
+                "payload": projects_data,
+                "batch_id": batch_id
             },
             "response_mode": "blocking", # 阻塞等待工作流执行完毕
             "user": "pkia-auto-collector"
