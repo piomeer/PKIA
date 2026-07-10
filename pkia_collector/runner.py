@@ -34,7 +34,9 @@ class DifyRunner:
         
         payload = {
             "inputs": {
-                "payload": projects_data,
+                "payload": {
+                    "projects": projects_data
+                },
                 "batch_id": batch_id
             },
             "response_mode": "blocking", # 阻塞等待工作流执行完毕
