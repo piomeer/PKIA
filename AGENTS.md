@@ -1,5 +1,23 @@
 # AGENTS.md
 
+# 核心开发规范
+
+本项目采用 OpenSpec + Superpowers 的双轨制 SDD 工作流。
+
+## 角色切换规则
+
+1. **当收到规划类指令时（如"设计..."、"规划..."、"分析需求"）**：
+   - 必须严格遵循 `.opencode/rules/openspec.md` 的规范。
+   - 所有的输出必须以 Markdown 格式保存在 `.specs/` 目录下。
+   - 严禁在此阶段修改源码。
+
+2. **当收到执行类指令时（如"实现 tasks.md 中的任务 1"、"写代码"）**：
+   - 必须严格遵循 `.opencode/rules/superpowers.md` 的规范。
+   - 必须先在测试目录编写单元测试，运行失败后再编写业务代码。
+   - 每完成一个任务，请更新 `.specs/tasks.md` 中的复选框状态 [x]。
+
+---
+
 ## Project Overview
 
 Dify is an open-source platform for developing LLM applications with an intuitive interface combining agentic AI workflows, RAG pipelines, agent capabilities, and model management.
@@ -37,6 +55,10 @@ The codebase is split into:
 - Prefer editing existing files; add new documentation only when requested.
 - Inject dependencies through constructors and preserve clean architecture boundaries.
 - Handle errors with domain-specific exceptions at the correct layer.
+
+## Agent Runtime
+
+The Agent Runtime Layer (`docs/runtime/01_workflow.md` through `06_development_constitution.md`) defines how AI agents operate in this repository. Read `docs/runtime/01_workflow.md` first for the complete task lifecycle.
 
 ## Project Conventions
 
