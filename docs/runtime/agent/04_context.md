@@ -11,7 +11,7 @@ These documents are loaded at the start of every task, regardless of scope:
 | `AGENTS.md` | Role routing, project conventions, workflow dispatch |
 | `.opencode/rules/openspec.md` | Planning phase rules |
 | `.opencode/rules/superpowers.md` | Execution phase rules |
-| `docs/runtime/06_development_constitution.md` | Immutable development rules |
+| `docs/runtime/agent/06_development_constitution.md` | Immutable development rules |
 | `progress/<namespace>.md` | Current phase, active decisions, blockers |
 
 ## Task-Specific Documents
@@ -22,7 +22,7 @@ Depending on the task, additional documents are loaded:
 |-----------|------------------|
 | Planning | `.specs/exploration.md`, `.specs/design.md`, all relevant source files |
 | Implementation | `.specs/tasks.md`, relevant source files, related specs |
-| Review | `.specs/` directory, `docs/runtime/05_review.md`, all changed files |
+| Review | `.specs/` directory, `docs/runtime/agent/05_review.md`, all changed files |
 
 ## Maximum Context Principle
 

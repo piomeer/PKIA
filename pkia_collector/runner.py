@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import logging
 import requests
 from dotenv import load_dotenv
@@ -34,9 +35,7 @@ class DifyRunner:
         
         payload = {
             "inputs": {
-                "payload": {
-                    "projects": projects_data
-                },
+                "projects_str": json.dumps(projects_data, ensure_ascii=False),
                 "batch_id": batch_id
             },
             "response_mode": "blocking", # 阻塞等待工作流执行完毕
@@ -53,8 +52,8 @@ class DifyRunner:
         logger.info(f"🚀 开始将 {len(projects_data)} 个项目推送到 Dify: {url}")
 
         try:
-            # 设置 120 秒超时，因为大模型打分可能需要较长时间
-            response = requests.post(url, json=payload, headers=headers, timeout=120)
+            # 设置 600 秒超时，给予大模型充分的推理时间
+            response = requests.post(url, json=payload, headers=headers, timeout=600)
             response.raise_for_status()
             
             result = response.json()

@@ -7,8 +7,8 @@
 |------|-----|
 | Version | 0.1.0 |
 | Updated | 2026-07-18 |
-| Status | MVP |
-| Current Milestone | Reporter ✅ / Launcher ✅ / Workflow MVP ✅ / P0 收口进行中 |
+| Status | v0.1.0 MVP (Released) |
+| Current Milestone | v0.1.0 里程碑达成 |
 
 ---
 

@@ -58,7 +58,7 @@ The codebase is split into:
 
 ## Agent Runtime
 
-The Agent Runtime Layer (`docs/runtime/01_workflow.md` through `06_development_constitution.md`) defines how AI agents operate in this repository. Read `docs/runtime/01_workflow.md` first for the complete task lifecycle.
+The Agent Runtime Layer (`docs/runtime/agent/01_workflow.md` through `docs/runtime/agent/06_development_constitution.md`) defines how AI agents operate in this repository. Read `docs/runtime/agent/01_workflow.md` first for the complete task lifecycle.
 
 ## Project Conventions
 
