@@ -7,6 +7,8 @@ Usage:
     python run.py --skip-docker-check      # Skip Docker verification
     python run.py --adapter-port=9000      # Custom Storage Adapter port
     python run.py --output-dir=/tmp/reports  # Custom report output directory
+    python run.py --no-open                  # Skip auto-opening the report
+    python run.py --editor=typora            # Specify editor
 
 Flow:
     1. Check Docker running (optional)
@@ -14,7 +16,8 @@ Flow:
     3. Start Storage Adapter (uvicorn)
     4. Run Collector + Dify Runner
     5. Generate Daily Report (Markdown)
-    6. Print execution summary
+    6. Open report in editor
+    7. Print execution summary
 """
 
 import os
@@ -51,11 +54,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-docker-check", action="store_true", help="Skip Docker daemon check")
     parser.add_argument("--adapter-port", type=int, default=STORAGE_ADAPTER_PORT, help="Storage Adapter port")
     parser.add_argument("--output-dir", type=str, default=REPORTS_DIR, help="Report output directory")
+    parser.add_argument("--no-open", action="store_true", help="Skip auto-opening the report")
+    parser.add_argument("--editor", type=str, default=None, help="Editor to open the report (e.g. code, typora, obsidian)")
     return parser.parse_args()
 
 
 def check_docker() -> bool:
-    logger.info("Step 1/4 — Checking Docker daemon ...")
+    logger.info("Step 1/7 — Checking Docker daemon ...")
     try:
         result = subprocess.run(
             ["docker", "info"],
@@ -75,7 +80,7 @@ def check_docker() -> bool:
 
 
 def check_dify_api(base_url: str) -> bool:
-    logger.info("Step 2/4 — Checking Dify API reachability ...")
+    logger.info("Step 2/7 — Checking Dify API reachability ...")
     if not DIFY_API_KEY:
         logger.warning("  ⚠️  DIFY_API_KEY not set, skipping health check")
         return True
@@ -97,7 +102,7 @@ def check_dify_api(base_url: str) -> bool:
 
 
 def start_storage_adapter(port: int) -> subprocess.Popen | None:
-    logger.info("Step 3/4 — Starting Storage Adapter ...")
+    logger.info("Step 3/7 — Starting Storage Adapter ...")
     try:
         proc = subprocess.Popen(
             [
@@ -131,7 +136,7 @@ def start_storage_adapter(port: int) -> subprocess.Popen | None:
 
 
 def run_collector(output_dir: str) -> dict:
-    logger.info("Step 4/4 — Running Collector + Dify Runner ...")
+    logger.info("Step 4/7 — Running Collector + Dify Runner ...")
     env = os.environ.copy()
     env["PKIA_REPORTS_DIR"] = output_dir
     env["ADAPTER_PORT"] = str(STORAGE_ADAPTER_PORT)
@@ -173,7 +178,7 @@ def run_collector(output_dir: str) -> dict:
 
 
 def run_reporter(storage_path: str, output_dir: str) -> dict:
-    logger.info("Step 5/6 — Generating Daily Report ...")
+    logger.info("Step 5/7 — Generating Daily Report ...")
     projects = load_json(storage_path)
     if not projects:
         logger.warning("  ⚠️  No data for report generation")
@@ -185,6 +190,50 @@ def run_reporter(storage_path: str, output_dir: str) -> dict:
     return {"success": True, "path": path, "count": len(projects)}
 
 
+def _detect_editor(preferred: str | None) -> tuple[str, list[str]]:
+    """Return (editor_name, command_args)."""
+    candidates = [
+        ("code", ["code"]),
+        ("typora", ["typora"]),
+        ("obsidian", ["obsidian"]),
+        ("xdg-open", ["xdg-open"]),
+        ("open", ["open"]),
+        ("start", ["start"]),
+    ]
+    if preferred:
+        candidates.insert(0, (preferred, [preferred]))
+    env_editor = os.environ.get("PKIA_EDITOR")
+    if env_editor and not preferred:
+        candidates.insert(0, (env_editor, [env_editor]))
+    for name, cmd in candidates:
+        try:
+            subprocess.run(cmd + ["--version"], capture_output=True, timeout=3)
+            return name, cmd
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            continue
+    return ("", [])
+
+
+def open_report(path: str, preferred_editor: str | None) -> str | None:
+    """Open the report file with the best available editor. Returns editor name or None."""
+    if not path or not os.path.exists(path):
+        logger.warning("  ⚠️  Report file not found, skipping open")
+        return None
+
+    editor_name, editor_cmd = _detect_editor(preferred_editor)
+    if not editor_cmd:
+        logger.info("  ⚠️  No supported editor found, skipping auto-open")
+        return None
+
+    try:
+        subprocess.Popen(editor_cmd + [path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        logger.info("  ✅ Opened with %s", editor_name)
+        return editor_name
+    except Exception as e:
+        logger.warning("  ⚠️  Failed to open with %s: %s", editor_name, e)
+        return None
+
+
 def print_summary(results: dict):
     print()
     print("=" * 50)
@@ -192,7 +241,9 @@ def print_summary(results: dict):
     print("=" * 50)
     print(f"  Projects collected:  {results.get('projects_count', '?')}")
     print(f"  Pushed to Dify:      {'✅ Yes' if results.get('pushed') else '❌ No'}")
-    print(f"  Report file:         {results.get('report_path', '?')}")
+    print(f"  📄 Report:           {results.get('report_path', '?')}")
+    open_info = results.get("open_info", "")
+    print(f"  📂 Open:             {open_info or '手动打开'}")
     status = "✅ SUCCESS" if results.get("success") else "❌ FAILED"
     print(f"  Overall status:      {status}")
     print("=" * 50)
@@ -209,7 +260,7 @@ def main():
             logger.error("Aborting — Docker is required. Use --skip-docker-check to bypass.")
             sys.exit(1)
     else:
-        logger.info("Step 1/4 — Skipped (--skip-docker-check)")
+        logger.info("Step 1/7 — Skipped (--skip-docker-check)")
 
     # Step 2: Dify API check
     base_url = DIFY_API_BASE_URL
@@ -230,7 +281,16 @@ def main():
     report_result = run_reporter(storage_path, args.output_dir)
     results["report_path"] = report_result.get("path")
 
-    # Step 6: Summary
+    # Step 6: Open report
+    editor_name = None
+    if not args.no_open and report_result.get("path"):
+        logger.info("Step 6/7 — Opening report ...")
+        editor_name = open_report(report_result["path"], args.editor)
+    else:
+        logger.info("Step 6/7 — Skipped (--no-open or no report)")
+    results["open_info"] = editor_name
+
+    # Step 7: Summary
     print_summary(results)
 
     # Cleanup
