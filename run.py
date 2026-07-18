@@ -264,7 +264,8 @@ def main():
 
     # Step 2: Dify API check
     base_url = DIFY_API_BASE_URL
-    if not check_dify_api(base_url):
+    dify_failed = not check_dify_api(base_url)
+    if dify_failed:
         logger.warning("Continuing without Dify API validation — may fail at push time.")
 
     # Step 3: Start Storage Adapter
@@ -280,6 +281,8 @@ def main():
     storage_path = os.path.join(os.getcwd(), "pkia_project", "pkia_storage.jsonl")
     report_result = run_reporter(storage_path, args.output_dir)
     results["report_path"] = report_result.get("path")
+    collector_success = results.get("success", False)
+    reporter_success = report_result.get("success", False) and bool(report_result.get("path"))
 
     # Step 6: Open report
     editor_name = None
@@ -301,8 +304,12 @@ def main():
         except subprocess.TimeoutExpired:
             adapter_proc.kill()
 
-    if not results.get("success"):
+    if not collector_success:
         sys.exit(1)
+    if dify_failed:
+        sys.exit(1)
+    if not reporter_success:
+        sys.exit(2)
 
 
 def signal_handler(signum, frame):
