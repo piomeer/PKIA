@@ -25,7 +25,7 @@ logger = logging.getLogger("pkia_reporter")
 
 DEFAULT_STORAGE = os.getenv(
     "PKIA_STORAGE_PATH",
-    os.path.join(os.getcwd(), "latest_run.json"),
+    os.path.join(os.getcwd(), "pkia_project", "pkia_storage.jsonl"),
 )
 
 
@@ -41,7 +41,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--storage",
         type=str,
         default=DEFAULT_STORAGE,
-        help="Path to JSON/JSONL data file. Default: latest_run.json",
+        help="Path to JSON/JSONL data file. Default: pkia_project/pkia_storage.jsonl",
     )
     parser.add_argument(
         "--output-dir",

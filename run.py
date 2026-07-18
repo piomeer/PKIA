@@ -226,7 +226,7 @@ def main():
     results["output_dir"] = args.output_dir
 
     # Step 5: Generate Daily Report
-    storage_path = os.path.join(os.getcwd(), "latest_run.json")
+    storage_path = os.path.join(os.getcwd(), "pkia_project", "pkia_storage.jsonl")
     report_result = run_reporter(storage_path, args.output_dir)
     results["report_path"] = report_result.get("path")
 
