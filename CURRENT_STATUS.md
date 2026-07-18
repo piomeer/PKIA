@@ -3,6 +3,13 @@
 > **Last updated**: 2026-07-18
 > **This file is the single source of truth for project status.**
 
+| 项目 | 值 |
+|------|-----|
+| Version | 0.1.0 |
+| Updated | 2026-07-18 |
+| Status | MVP |
+| Current Milestone | Reporter ✅ / Launcher ✅ / Workflow MVP ✅ / P0 收口进行中 |
+
 ---
 
 ## 当前版本
