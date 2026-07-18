@@ -290,3 +290,19 @@ Validation Gate (Code Node)
 | Version | Date | Author | Change Summary |
 |---------|------|--------|----------------|
 | v1 | 2026-07 | PKIA MVP Agent | Initial release. Fat Object evolution, Business State Machine, Batch Flow, Variable Flow, Validation Gate assertions. Refactored from `runtime_architecture_and_node_mapping_specification_v1.md`. |
+
+---
+
+## 7. Implementation Status
+
+| 组件 | 状态 |
+|------|------|
+| Collector | ✅ Implemented |
+| Dify Workflow Trigger | ✅ Implemented |
+| Storage Adapter (接收端点) | ✅ Implemented |
+| Normalization (Stage 2) | ❌ Not Started |
+| Classification (Stage 3) | ❌ Not Started |
+| 4-Dim Scoring (Stages 4-7) | ❌ Not Started |
+| Total Score/Ranking (Stages 8-10) | ❌ Not Started |
+| Reporter | ❌ Not Started |
+| Launcher | ❌ Not Started |

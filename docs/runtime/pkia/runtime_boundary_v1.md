@@ -260,3 +260,19 @@ This document follows the canonical Rule Registry in `runtime_document_style_gui
 | Version | Date | Author | Change Summary |
 |---------|------|--------|----------------|
 | v1 | 2026-07 | PKIA MVP Agent | Initial release. Refactored from `Runtime Design v1.0.md`. Collector decision finalized (HTTP → Code Node). Principles consolidated to P-01–P-06. All open questions, future considerations, and discussion removed per style guide §9.2. |
+
+---
+
+## 7. Implementation Status
+
+| 组件 | 状态 |
+|------|------|
+| Collector | ✅ Implemented |
+| Dify Workflow Trigger | ✅ Implemented |
+| Storage Adapter (接收端点) | ✅ Implemented |
+| Normalization (Stage 2) | ❌ Not Started |
+| Classification (Stage 3) | ❌ Not Started |
+| 4-Dim Scoring (Stages 4-7) | ❌ Not Started |
+| Total Score/Ranking (Stages 8-10) | ❌ Not Started |
+| Reporter | ❌ Not Started |
+| Launcher | ❌ Not Started |

@@ -137,3 +137,19 @@ runtime_glossary_v1.md               (遇到术语疑问时查阅)
 | Version | Date | Author | Change Summary |
 |---------|------|--------|----------------|
 | v1 | 2026-07 | PKIA MVP Agent | Initial release. Topology diagram, document index, and reading order for the refactored Runtime Architecture directory. |
+
+---
+
+## 5. Implementation Status
+
+| 组件 | 状态 |
+|------|------|
+| Collector | ✅ Implemented |
+| Dify Workflow Trigger | ✅ Implemented |
+| Storage Adapter (接收端点) | ✅ Implemented |
+| Normalization (Stage 2) | ❌ Not Started |
+| Classification (Stage 3) | ❌ Not Started |
+| 4-Dim Scoring (Stages 4-7) | ❌ Not Started |
+| Total Score/Ranking (Stages 8-10) | ❌ Not Started |
+| Reporter | ❌ Not Started |
+| Launcher | ❌ Not Started |

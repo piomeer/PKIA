@@ -224,3 +224,14 @@ v0.1 通过结构化日志输出指标。各节点在关键边界输出 JSON 格
 | Version | Date | Author | Change Summary |
 |---------|------|--------|----------------|
 | v1 | 2026-07 | PKIA MVP Agent | Initial release. Runtime sequence, trigger config, environment variables, Storage Adapter spec, Metrics (with observability note), INFO logging. Refactored from `runtime_architecture_and_node_mapping_specification_v1.md`. |
+
+---
+
+## 7. Implementation Status
+
+| 组件 | 状态 |
+|------|------|
+| Collector | ✅ Implemented |
+| Dify Workflow Trigger | ✅ Implemented |
+| Storage Adapter (接收端点) | ✅ Implemented |
+| Launcher | ❌ Not Started (Cron scheduling pending Dify deployment) |
