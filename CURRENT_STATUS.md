@@ -73,6 +73,18 @@ PKIA v0.1 MVP
 
 ---
 
+## Exit Codes
+
+| 退出码 | 含义 |
+|--------|------|
+| 0 | 全部成功（日报已生成） |
+| 1 | Pipeline 失败（Collector 或 Dify 不可达） |
+| 2 | Reporter 失败（日报生成失败） |
+
+说明：退出码定义与 `run.py` 中的决策矩阵一致，可供 CI / systemd / GitHub Actions 引用。
+
+---
+
 ## 关键文件路径
 
 | 用途 | 路径 |
