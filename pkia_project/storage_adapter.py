@@ -1,6 +1,6 @@
 import os
+import json
 import logging
-from datetime import datetime
 
 import uvicorn
 from fastapi import FastAPI, Request
@@ -11,28 +11,31 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="PKIA Storage Adapter", version="1.0.0")
 
-REPORTS_DIR = os.getenv("PKIA_REPORTS_DIR", os.path.join(os.getcwd(), "pkia", "reports"))
+DATA_FILE = os.getenv("PKIA_STORAGE_PATH", os.path.join(os.getcwd(), "pkia_project", "pkia_storage.jsonl"))
 
 
-@app.post("/report")
-async def receive_report(request: Request):
-    body = await request.body()
-    content = body.decode("utf-8")
+@app.post("/api/v1/projects")
+async def receive_project(request: Request):
+    body = await request.json()
+    batch_id = body.get("batch_id", "unknown")
+    project_data = body.get("project_data", body)
 
-    date_str = request.headers.get("X-Date") or datetime.now().strftime("%Y-%m-%d")
-    os.makedirs(REPORTS_DIR, exist_ok=True)
-    path = os.path.join(REPORTS_DIR, f"{date_str}.md")
+    os.makedirs(os.path.dirname(DATA_FILE) or ".", exist_ok=True)
+    record = {
+        "batch_id": batch_id,
+        "project_data": project_data,
+        "pipeline_status": body.get("pipeline_status", "PROMOTED"),
+    }
+    with open(DATA_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-    logger.info(f"Report saved to {path} ({len(content)} bytes)")
-    return JSONResponse({"status": "ok", "path": path}, status_code=200)
+    logger.info(f"Project stored: {project_data.get('project_name', '?')} (batch={batch_id})")
+    return JSONResponse({"status": "ok", "stored": True}, status_code=200)
 
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "reports_dir": REPORTS_DIR}
+    return {"status": "ok", "storage_path": DATA_FILE}
 
 
 if __name__ == "__main__":
