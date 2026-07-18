@@ -14,7 +14,7 @@ P0 文档补丁全部完成，PKIA MVP v0.1 Baseline 已锁定。
 ---
 
 ## Active Tasks
-- **Runtime 目录重构与 7 文档集合生成**: ✅ 完成
+- **Phase 1 状态台账创建**: ✅ 完成
 - **等待下一步**: GitHub Trending Collector 第一版实现
 
 ---
@@ -29,6 +29,7 @@ P0 文档补丁全部完成，PKIA MVP v0.1 Baseline 已锁定。
 | Runtime Boundary 重构 → runtime_boundary_v1.md | ✅ 完成 | `docs/runtime/runtime_boundary_v1.md` 创建，遵循 style guide 标准结构。Collector 决策已锁定 (HTTP→Code)。Principles 合并为 P-01~P-06。Runtime Rules 引用 R-01~R-05。旧文档标记为 Superseded。大小: 467→~220 行。 |
 | Runtime Architecture & Node Mapping Specification | ✅ 完成 | `docs/runtime/runtime_architecture_and_node_mapping_specification_v1.md` 创建。定义 3 域拓扑、7 节点映射矩阵、IO 契约、状态机、监控指标与日志策略。合并 runtime_architecture_overview + node_mapping 职责。添加 P-07 Fail-Fast Isolation 与 P-08 Unified Scoring 原则。 |
 | Runtime 目录重构 (Directory as Architecture) | ✅ 完成 | 将单一组合文档拆分为 7 份专题文档。新建 `runtime_architecture_overview_v1.md` (拓扑总图), `node_mapping_v1.md` (MD-01/MD-02), `data_flow_v1.md` (Fat Object + State Machine), `node_io_contract_v1.md` (IO 契约), `failure_handling_v1.md` (纯故障处理), `deployment_v1.md` (部署 + Metrics)。Markdown 组合文档为 Superseded。P-07/P-08 降级为 MD-01/MD-02。更新 style guide 文档树。 |
+| Phase 1 状态台账创建 | ✅ 完成 | `progress/pkia_phase1_status.md` 创建。Phase 1 标注为 MVP 完成。P0-1 标记已解决 (EXP-010 验证)。P0-2 降级为 P1。实验台账含 10 条 EXP 记录。 |
 | Runtime Document Style Guide 文档创建 | ✅ 完成 | `docs/runtime/runtime_document_style_guide_v1.md` 已创建。定义 Runtime 文档层次结构（7 份文档）、标准文档结构（7 节强制）、命名规范（snake_case）、Runtime 规则约定（R-01~R-05）、交叉引用规则和写作规范。 |
 | Runtime Style Guide 追加 Lifecycle + Rule Numbering | ✅ 完成 | 新增 §6 文档生命周期（Draft→Review→Approved→Frozen）和 §7 运行时核心规则编号规范，替换规范 R-01~R-05 定义。 |
 
