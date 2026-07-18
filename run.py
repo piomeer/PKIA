@@ -13,7 +13,8 @@ Flow:
     2. Check Dify API reachable
     3. Start Storage Adapter (uvicorn)
     4. Run Collector + Dify Runner
-    5. Print execution summary
+    5. Generate Daily Report (Markdown)
+    6. Print execution summary
 """
 
 import os
@@ -27,6 +28,8 @@ from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
+
+from pkia_reporter.reporter import load_json, generate_report, write_report
 
 logging.basicConfig(
     level=logging.INFO,
@@ -169,6 +172,19 @@ def run_collector(output_dir: str) -> dict:
         return {"returncode": -1, "projects_count": 0, "pushed": False, "success": False}
 
 
+def run_reporter(storage_path: str, output_dir: str) -> dict:
+    logger.info("Step 5/6 — Generating Daily Report ...")
+    projects = load_json(storage_path)
+    if not projects:
+        logger.warning("  ⚠️  No data for report generation")
+        return {"success": False, "path": None, "count": 0}
+
+    report = generate_report(projects)
+    path = write_report(report, output_dir)
+    logger.info("  ✅ Report written: %s (%d projects)", path, len(projects))
+    return {"success": True, "path": path, "count": len(projects)}
+
+
 def print_summary(results: dict):
     print()
     print("=" * 50)
@@ -176,7 +192,7 @@ def print_summary(results: dict):
     print("=" * 50)
     print(f"  Projects collected:  {results.get('projects_count', '?')}")
     print(f"  Pushed to Dify:      {'✅ Yes' if results.get('pushed') else '❌ No'}")
-    print(f"  Report storage:      {results.get('output_dir', '?')}")
+    print(f"  Report file:         {results.get('report_path', '?')}")
     status = "✅ SUCCESS" if results.get("success") else "❌ FAILED"
     print(f"  Overall status:      {status}")
     print("=" * 50)
@@ -209,7 +225,12 @@ def main():
     results = run_collector(args.output_dir)
     results["output_dir"] = args.output_dir
 
-    # Step 5: Summary
+    # Step 5: Generate Daily Report
+    storage_path = os.path.join(os.getcwd(), "latest_run.json")
+    report_result = run_reporter(storage_path, args.output_dir)
+    results["report_path"] = report_result.get("path")
+
+    # Step 6: Summary
     print_summary(results)
 
     # Cleanup
