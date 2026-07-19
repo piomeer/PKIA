@@ -44,7 +44,7 @@ logger = logging.getLogger("pkia.runner")
 load_dotenv()
 
 DIFY_API_KEY = os.getenv("DIFY_API_KEY", "")
-DIFY_API_BASE_URL = os.getenv("DIFY_API_BASE_URL", os.getenv("DIFY_API_URL", "http://127.0.0.1/v1"))
+DIFY_API_BASE_URL = os.getenv("DIFY_API_BASE_URL") or os.getenv("DIFY_API_URL")
 STORAGE_ADAPTER_PORT = int(os.getenv("ADAPTER_PORT", "8000"))
 REPORTS_DIR = os.getenv("PKIA_REPORTS_DIR", os.path.join(os.getcwd(), "pkia", "reports"))
 
@@ -79,25 +79,28 @@ def check_docker() -> bool:
         return False
 
 
-def check_dify_api(base_url: str) -> bool:
+def check_dify_api(base_url: str | None) -> bool:
     logger.info("Step 2/7 — Checking Dify API reachability ...")
+    if base_url:
+        url = base_url.rstrip("/") + "/workflows/run"
+    else:
+        url = "http://127.0.0.1/v1/workflows/run"
     if not DIFY_API_KEY:
         logger.warning("  ⚠️  DIFY_API_KEY not set, skipping health check")
         return True
     try:
-        url = f"{base_url.rstrip('/v1')}/v1/workflows/run"
         headers = {"Authorization": f"Bearer {DIFY_API_KEY}"}
-        resp = requests.get(url.replace("/run", ""), headers=headers, timeout=10)
-        if resp.status_code < 500:
-            logger.info(f"  ✅ Dify API reachable at {base_url}")
+        resp = requests.get(url, headers=headers, timeout=5)
+        if resp.status_code < 500 or resp.status_code in (401, 403):
+            logger.info(f"  ✅ Dify API reachable at {url}")
             return True
         logger.error(f"  ❌ Dify returned {resp.status_code}: {resp.text[:200]}")
         return False
     except requests.ConnectionError:
-        logger.error(f"  ❌ Cannot connect to {base_url}")
+        logger.error(f"  ❌ Cannot connect to {url}")
         return False
     except requests.Timeout:
-        logger.error(f"  ❌ Connection to {base_url} timed out")
+        logger.error(f"  ❌ Connection to {url} timed out")
         return False
 
 
@@ -155,26 +158,34 @@ def run_collector(output_dir: str) -> dict:
                 logger.warning(f"  {line}")
 
         # Parse summary from output
+        stdout_text = result.stdout
         projects_count = 0
-        pushed = False
-        for line in result.stdout.splitlines():
-            if "共" in line and "个项目" in line:
-                import re
-                m = re.search(r"共\s*(\d+)\s*个项目", line)
-                if m:
-                    projects_count = int(m.group(1))
-            if "成功触发" in line or "success" in line.lower():
-                pushed = True
+        pushed_to_dify = False
+
+        for line in stdout_text.splitlines():
+            # Extract project count: "成功解析出 X 个项目"
+            import re
+            m = re.search(r"成功解析出\s*(\d+)\s*个项目", line)
+            if m:
+                projects_count = int(m.group(1))
+
+            # Detect push failure first
+            if "推送 Dify 失败" in line or "Connection refused" in line or "Max retries exceeded" in line:
+                pushed_to_dify = False
+
+            # Detect push success
+            if "成功触发 Dify 工作流" in line or "工作流最终状态: succeeded" in line:
+                pushed_to_dify = True
 
         return {
             "returncode": result.returncode,
             "projects_count": projects_count,
-            "pushed": pushed,
+            "pushed_to_dify": pushed_to_dify,
             "success": result.returncode == 0,
         }
     except subprocess.TimeoutExpired:
         logger.error("  ❌ Collector timed out after 600s")
-        return {"returncode": -1, "projects_count": 0, "pushed": False, "success": False}
+        return {"returncode": -1, "projects_count": 0, "pushed_to_dify": False, "success": False}
 
 
 def run_reporter(storage_path: str, output_dir: str) -> dict:
@@ -240,7 +251,7 @@ def print_summary(results: dict):
     print("  PKIA Run Summary")
     print("=" * 50)
     print(f"  Projects collected:  {results.get('projects_count', '?')}")
-    print(f"  Pushed to Dify:      {'✅ Yes' if results.get('pushed') else '❌ No'}")
+    print(f"  Pushed to Dify:      {'✅ Yes' if results.get('pushed_to_dify') else '❌ No'}")
     print(f"  📄 Report:           {results.get('report_path', '?')}")
     open_info = results.get("open_info", "")
     print(f"  📂 Open:             {open_info or '手动打开'}")
@@ -263,8 +274,7 @@ def main():
         logger.info("Step 1/7 — Skipped (--skip-docker-check)")
 
     # Step 2: Dify API check
-    base_url = DIFY_API_BASE_URL
-    dify_failed = not check_dify_api(base_url)
+    dify_failed = not check_dify_api(DIFY_API_BASE_URL)
     if dify_failed:
         logger.warning("Continuing without Dify API validation — may fail at push time.")
 
