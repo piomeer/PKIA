@@ -175,7 +175,7 @@ def run_collector(output_dir: str) -> dict:
 
             if "成功触发 Dify 工作流" in cleaned or "工作流最终状态: succeeded" in cleaned:
                 success_count += 1
-            if "推送 Dify 失败" in cleaned or "Connection refused" in cleaned or "Max retries exceeded" in cleaned:
+            if "推送 Dify 失败" in cleaned or "Connection refused" in cleaned or "Max retries exceeded" in cleaned or "工作流最终状态: failed" in cleaned:
                 failure_count += 1
 
         pushed_to_dify = success_count >= 1 and failure_count == 0
