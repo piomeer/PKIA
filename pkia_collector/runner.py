@@ -79,8 +79,12 @@ class DifyRunner:
                 ok = 0
                 fail = 0
                 for item in analysis_list:
-                    item_project = item.get("project_data") or item.get("project") or {}
-                    item_analysis = item.get("analysis") or item.get("analysis_result") or item
+                    item_project = item.get("project_data", {})
+                    item_analysis = item.get("analysis_data", {})
+                    if not item_analysis:
+                        logger.warning(f"analysis_data 为空，跳过该项 (project={item_project.get('project_name', '?')})")
+                        fail += 1
+                        continue
                     analysis_payload = {
                         "batch_id": batch_id,
                         "project_data": item_project,
