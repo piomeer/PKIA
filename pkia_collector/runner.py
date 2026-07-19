@@ -83,7 +83,14 @@ class DifyRunner:
                     item_project = item.get("project_data", {})
                     item_analysis = item.get("analysis_data", {})
                     if not item_analysis:
-                        logger.warning(f"analysis_data 为空，跳过该项 (project={item_project.get('project_name', '?')})")
+                        error_field = item.get("error", "")
+                        preview_field = item.get("cleaned_preview", "")
+                        extra = ""
+                        if error_field:
+                            extra += f", error={error_field}"
+                        if preview_field:
+                            extra += f", cleaned_preview={preview_field[:100]}"
+                        logger.warning(f"analysis_data 为空，跳过该项 (project={item_project.get('project_name', '?')}{extra})")
                         fail += 1
                         continue
                     analysis_payload = {
