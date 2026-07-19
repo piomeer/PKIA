@@ -157,14 +157,17 @@ def run_collector(output_dir: str) -> dict:
             for line in result.stderr.splitlines():
                 logger.warning(f"  {line}")
 
-        # Parse summary from output — strip log prefixes before matching
+        # Parse summary from output — runner logs to stderr, so combine both streams
         import re
         projects_collected = 0
         success_count = 0
         failure_count = 0
 
-        for raw_line in result.stdout.splitlines():
-            cleaned = re.sub(r"^\d{2}:\d{2}:\d{2}\s+\[\w+\]\s+", "", raw_line)
+        all_lines = (result.stdout or "").splitlines() + (result.stderr or "").splitlines()
+        for raw_line in all_lines:
+            # Strip log prefixes: HH:MM:SS [LEVEL]  or  YYYY-MM-DD HH:MM:SS,mmm - LEVEL -
+            cleaned = re.sub(r"^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2},\d+\s*-\s+\w+\s*-\s*", "", raw_line)
+            cleaned = re.sub(r"^\d{2}:\d{2}:\d{2}\s+\[\w+\]\s+", "", cleaned)
 
             m = re.search(r"成功解析出\s+(\d+)\s+个项目", cleaned)
             if m:
