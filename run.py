@@ -159,16 +159,16 @@ def run_collector(output_dir: str) -> dict:
 
         # Parse summary from output — strip log prefixes before matching
         import re
-        projects_count = 0
+        projects_collected = 0
         success_count = 0
         failure_count = 0
 
         for raw_line in result.stdout.splitlines():
             cleaned = re.sub(r"^\d{2}:\d{2}:\d{2}\s+\[\w+\]\s+", "", raw_line)
 
-            m = re.search(r"成功解析出\s*(\d+)\s*个项目", cleaned)
+            m = re.search(r"成功解析出\s+(\d+)\s+个项目", cleaned)
             if m:
-                projects_count = int(m.group(1))
+                projects_collected = int(m.group(1))
 
             if "成功触发 Dify 工作流" in cleaned or "工作流最终状态: succeeded" in cleaned:
                 success_count += 1
@@ -176,10 +176,11 @@ def run_collector(output_dir: str) -> dict:
                 failure_count += 1
 
         pushed_to_dify = success_count >= 1 and failure_count == 0
+        print(f"[DEBUG] projects_collected={projects_collected}, pushed_to_dify={pushed_to_dify}, success_count={success_count}, failure_count={failure_count}")
 
         return {
             "returncode": result.returncode,
-            "projects_count": projects_count,
+            "projects_collected": projects_collected,
             "pushed_to_dify": pushed_to_dify,
             "success": result.returncode == 0,
         }
@@ -250,7 +251,7 @@ def print_summary(results: dict):
     print("=" * 50)
     print("  PKIA Run Summary")
     print("=" * 50)
-    print(f"  Projects collected:  {results.get('projects_count', '?')}")
+    print(f"  Projects collected:  {results.get('projects_collected', '?')}")
     print(f"  Pushed to Dify:      {'✅ Yes' if results.get('pushed_to_dify') else '❌ No'}")
     print(f"  📄 Report:           {results.get('report_path', '?')}")
     open_info = results.get("open_info", "")
