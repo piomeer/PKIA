@@ -21,23 +21,50 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _normalize_analysis(raw: dict) -> dict:
+    return {
+        "classification": raw.get("classification"),
+        "scores": {
+            "career_alignment": raw.get("career_alignment"),
+            "interest_match": raw.get("interest_match"),
+            "trend_score": raw.get("trend_score"),
+            "research_score": raw.get("research_score"),
+        },
+        "total_score": raw.get("total_score"),
+        "recommendation": raw.get("recommendation"),
+        "reasoning": raw.get("reasoning"),
+        "tags": raw.get("tags", []),
+        "confidence": raw.get("confidence"),
+    }
+
+
 @app.post("/api/v1/projects")
 async def receive_project(request: Request):
     body = await request.json()
     batch_id = body.get("batch_id", "unknown")
     project_data = body.get("project_data", body)
 
+    analysis_raw = body.get("analysis") or body.get("analysis_result")
+    has_analysis = analysis_raw is not None
+
     os.makedirs(os.path.dirname(DATA_FILE) or ".", exist_ok=True)
     record = {
         "batch_id": batch_id,
         "project_data": project_data,
-        "pipeline_status": body.get("pipeline_status", "PROMOTED"),
+        "pipeline_status": "ANALYZED" if has_analysis else body.get("pipeline_status", "PROMOTED"),
     }
+    if has_analysis:
+        record["analysis"] = _normalize_analysis(analysis_raw)
+        record["updated_at"] = _now()
+
     with FileLock(LOCK_FILE):
         with open(DATA_FILE, "a", encoding="utf-8") as f:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-    logger.info(f"Project stored: {project_data.get('project_name', '?')} (batch={batch_id})")
+    if has_analysis:
+        logger.info(f"Project stored: {project_data.get('project_name', '?')} (batch={batch_id}, analysis=yes)")
+    else:
+        logger.info(f"Project stored: {project_data.get('project_name', '?')} (batch={batch_id})")
     return JSONResponse({"status": "ok", "stored": True}, status_code=200)
 
 
