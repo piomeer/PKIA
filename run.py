@@ -157,25 +157,25 @@ def run_collector(output_dir: str) -> dict:
             for line in result.stderr.splitlines():
                 logger.warning(f"  {line}")
 
-        # Parse summary from output
-        stdout_text = result.stdout
+        # Parse summary from output — strip log prefixes before matching
+        import re
         projects_count = 0
-        pushed_to_dify = False
+        success_count = 0
+        failure_count = 0
 
-        for line in stdout_text.splitlines():
-            # Extract project count: "成功解析出 X 个项目"
-            import re
-            m = re.search(r"成功解析出\s*(\d+)\s*个项目", line)
+        for raw_line in result.stdout.splitlines():
+            cleaned = re.sub(r"^\d{2}:\d{2}:\d{2}\s+\[\w+\]\s+", "", raw_line)
+
+            m = re.search(r"成功解析出\s*(\d+)\s*个项目", cleaned)
             if m:
                 projects_count = int(m.group(1))
 
-            # Detect push failure first
-            if "推送 Dify 失败" in line or "Connection refused" in line or "Max retries exceeded" in line:
-                pushed_to_dify = False
+            if "成功触发 Dify 工作流" in cleaned or "工作流最终状态: succeeded" in cleaned:
+                success_count += 1
+            if "推送 Dify 失败" in cleaned or "Connection refused" in cleaned or "Max retries exceeded" in cleaned:
+                failure_count += 1
 
-            # Detect push success
-            if "成功触发 Dify 工作流" in line or "工作流最终状态: succeeded" in line:
-                pushed_to_dify = True
+        pushed_to_dify = success_count >= 1 and failure_count == 0
 
         return {
             "returncode": result.returncode,

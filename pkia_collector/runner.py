@@ -73,7 +73,7 @@ if __name__ == "__main__":
         logger.error("❌ 未找到 DIFY_API_KEY，请在 .env 文件中配置 DIFY_API_KEY=app-你的真实KEY")
         sys.exit(1)
 
-    DIFY_API_URL = os.getenv("DIFY_API_URL", "http://127.0.0.1/v1")
+    DIFY_API_URL = os.getenv("DIFY_API_BASE_URL", "http://127.0.0.1/v1")
 
     runner = DifyRunner(api_key=DIFY_API_KEY, base_url=DIFY_API_URL)
 
