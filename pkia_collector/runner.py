@@ -81,15 +81,17 @@ class DifyRunner:
                 for item in analysis_list:
                     item_project = item.get("project_data") or item.get("project") or {}
                     item_analysis = item.get("analysis") or item.get("analysis_result") or item
+                    analysis_payload = {
+                        "batch_id": batch_id,
+                        "project_data": item_project,
+                        "analysis": item_analysis,
+                        "pipeline_status": "ANALYZED",
+                    }
+                    logger.info(f"即将 POST 到 Storage Adapter，body 前 500 字符: {json.dumps(analysis_payload, ensure_ascii=False)[:500]}")
                     try:
                         resp = requests.post(
                             f"{storage_url}/api/v1/projects",
-                            json={
-                                "batch_id": batch_id,
-                                "project_data": item_project,
-                                "analysis": item_analysis,
-                                "pipeline_status": "ANALYZED",
-                            },
+                            json=analysis_payload,
                             timeout=10,
                         )
                         resp.raise_for_status()
