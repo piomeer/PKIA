@@ -64,6 +64,7 @@ class DifyRunner:
 
             # 4. 将 Workflow 分析结果写回 Storage Adapter
             outputs = result.get("data", {}).get("outputs", {})
+            logger.info(f"Dify 响应的 data.outputs 完整内容: {json.dumps(outputs, ensure_ascii=False)[:2000]}")
             analysis_list = (
                 outputs.get("analysis_results")
                 or outputs.get("output")
