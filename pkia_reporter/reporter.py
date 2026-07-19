@@ -41,7 +41,7 @@ def _normalize(record: dict) -> dict:
 
 def _has_workflow_data(projects: list[dict]) -> bool:
     return any(
-        "classification" in p or "total_score" in p or "recommendation" in p
+        p.get("analysis") and p["analysis"] != {}
         for p in projects
     )
 
@@ -109,8 +109,8 @@ def _b(lines: list[str], projects: list[dict], has_wf: bool):
     lines.append("")
 
     if has_wf:
-        header = "| # | 项目名 | 分类 | 总分 | 推荐 | Stars | 语言 |"
-        sep    = "|---|--------|------|------|------|-------|------|"
+        header = "| # | 项目名称 | 分类 | 总分 | 推荐 | Stars | URL |"
+        sep    = "|---|----------|------|------|------|-------|-----|"
     else:
         header = "| # | 项目名 | 描述 | Stars | 语言 | URL |"
         sep    = "|---|--------|------|-------|------|-----|"
@@ -120,17 +120,19 @@ def _b(lines: list[str], projects: list[dict], has_wf: bool):
 
     for i, p in enumerate(projects, 1):
         name = p.get("project_name", "?")
+        url = p.get("repo_url", "")
         lang = p.get("language") or "-"
 
         if has_wf:
-            cat = p.get("classification", {}).get("primary_category", "-")
-            ts = p.get("total_score", "-")
-            rec = p.get("recommendation", "-")
+            analysis = p.get("analysis", {}) or {}
+            cat = analysis.get("classification", "-")
+            ts = analysis.get("total_score", "-")
+            raw_rec = analysis.get("recommendation", "")
+            rec_display = "⭐ 推荐" if raw_rec in ("Highly Recommended", "Recommended") else (raw_rec or "-")
             star_str = f"{p.get('stars', 0):,}"
-            lines.append(f"| {i} | {name} | {cat} | {ts} | {rec} | {star_str} | {lang} |")
+            lines.append(f"| {i} | {name} | {cat} | {ts} | {rec_display} | {star_str} | {url} |")
         else:
             desc = _truncate(p.get("description", ""), 60)
-            url = p.get("repo_url", "")
             star_str = f"{p.get('stars', 0):,}"
             lines.append(f"| {i} | {name} | {desc} | {star_str} | {lang} | {url} |")
 
@@ -141,16 +143,20 @@ def _c(lines: list[str], projects: list[dict], has_wf: bool):
     lines.append("## 阅读建议")
     lines.append("")
 
-    sort_key = "total_score" if has_wf else "stars"
-    top3 = sorted(projects, key=lambda p: -(p.get(sort_key, 0) or 0))[:3]
+    if has_wf:
+        top3 = sorted(projects, key=lambda p: -(p.get("analysis", {}) or {}).get("total_score", 0) or 0)[:3]
+    else:
+        top3 = sorted(projects, key=lambda p: -(p.get("stars", 0) or 0))[:3]
 
     for rank, p in enumerate(top3, 1):
         name = p.get("project_name", "?")
         desc = p.get("description", "")
 
         if has_wf:
-            rec = p.get("recommendation", "")
-            extra = f" | 总分: {p.get('total_score', '?')} | 推荐: {rec}" if rec else ""
+            analysis = p.get("analysis", {}) or {}
+            ts = analysis.get("total_score", "?")
+            rec = analysis.get("recommendation", "")
+            extra = f" | 总分: {ts} | 推荐: {rec}" if rec else ""
         else:
             extra = ""
 
