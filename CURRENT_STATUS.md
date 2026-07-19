@@ -1,14 +1,14 @@
 # PKIA — Current Status
 
-> **Last updated**: 2026-07-18
+> **Last updated**: 2026-07-19
 > **This file is the single source of truth for project status.**
 
 | 项目 | 值 |
 |------|-----|
 | Version | 0.1.0 |
-| Updated | 2026-07-18 |
+| Updated | 2026-07-19 |
 | Status | v0.1.0 MVP (Released) |
-| Current Milestone | v0.1.0 里程碑达成 |
+| Current Milestone | M1 完成 — AI Analysis Pipeline 已打通 |
 
 ---
 
