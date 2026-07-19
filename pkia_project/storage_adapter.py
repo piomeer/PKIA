@@ -1,10 +1,12 @@
 import os
 import json
 import logging
+from datetime import datetime, timezone
 
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from filelock import FileLock
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -12,6 +14,11 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="PKIA Storage Adapter", version="1.0.0")
 
 DATA_FILE = os.getenv("PKIA_STORAGE_PATH", os.path.join(os.getcwd(), "pkia_project", "pkia_storage.jsonl"))
+LOCK_FILE = DATA_FILE + ".lock"
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 @app.post("/api/v1/projects")
@@ -26,11 +33,66 @@ async def receive_project(request: Request):
         "project_data": project_data,
         "pipeline_status": body.get("pipeline_status", "PROMOTED"),
     }
-    with open(DATA_FILE, "a", encoding="utf-8") as f:
-        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    with FileLock(LOCK_FILE):
+        with open(DATA_FILE, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     logger.info(f"Project stored: {project_data.get('project_name', '?')} (batch={batch_id})")
     return JSONResponse({"status": "ok", "stored": True}, status_code=200)
+
+
+@app.patch("/api/v1/projects/{project_id}/analysis")
+async def patch_analysis(project_id: str, request: Request):
+    body = await request.json()
+
+    if not os.path.exists(DATA_FILE):
+        return JSONResponse({"error": "No data file found"}, status_code=404)
+
+    with FileLock(LOCK_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        found = False
+        updated_lines = []
+
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            record = json.loads(stripped)
+            pd = record.get("project_data", {})
+            if pd.get("project_id") == project_id:
+                record["analysis"] = {
+                    "classification": body.get("classification"),
+                    "scores": {
+                        "career_alignment": body.get("career_alignment"),
+                        "interest_match": body.get("interest_match"),
+                        "trend_score": body.get("trend_score"),
+                        "research_score": body.get("research_score"),
+                    },
+                    "total_score": body.get("total_score"),
+                    "recommendation": body.get("recommendation"),
+                    "reasoning": body.get("reasoning"),
+                    "tags": body.get("tags", []),
+                    "confidence": body.get("confidence"),
+                }
+                record["pipeline_status"] = "ANALYZED"
+                record["updated_at"] = _now()
+                found = True
+
+            updated_lines.append(json.dumps(record, ensure_ascii=False) + "\n")
+
+        if not found:
+            return JSONResponse(
+                {"error": f"project_id '{project_id}' not found in storage"},
+                status_code=404,
+            )
+
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            f.writelines(updated_lines)
+
+    logger.info(f"Analysis patched for project_id={project_id}")
+    return JSONResponse({"status": "ok", "patched": True, "project_id": project_id}, status_code=200)
 
 
 @app.get("/health")
