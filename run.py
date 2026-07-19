@@ -259,7 +259,8 @@ def print_summary(results: dict):
     print(f"  📄 Report:           {results.get('report_path', '?')}")
     open_info = results.get("open_info", "")
     print(f"  📂 Open:             {open_info or '手动打开'}")
-    status = "✅ SUCCESS" if results.get("success") else "❌ FAILED"
+    exit_ok = results.get("exit_code", 1) == 0
+    status = "✅ SUCCESS" if exit_ok else "❌ FAILED"
     print(f"  Overall status:      {status}")
     print("=" * 50)
 
@@ -295,7 +296,6 @@ def main():
     storage_path = os.path.join(os.getcwd(), "pkia_project", "pkia_storage.jsonl")
     report_result = run_reporter(storage_path, args.output_dir)
     results["report_path"] = report_result.get("path")
-    collector_success = results.get("success", False)
     reporter_success = report_result.get("success", False) and bool(report_result.get("path"))
 
     # Step 6: Open report
@@ -308,6 +308,15 @@ def main():
     results["open_info"] = editor_name
 
     # Step 7: Summary
+    pushed_to_dify = results.get("pushed_to_dify", False)
+    if not pushed_to_dify:
+        exit_code = 1
+    elif not reporter_success:
+        exit_code = 2
+    else:
+        exit_code = 0
+    results["exit_code"] = exit_code
+
     print_summary(results)
 
     # Cleanup
@@ -318,12 +327,7 @@ def main():
         except subprocess.TimeoutExpired:
             adapter_proc.kill()
 
-    if not collector_success:
-        sys.exit(1)
-    if dify_failed:
-        sys.exit(1)
-    if not reporter_success:
-        sys.exit(2)
+    sys.exit(exit_code)
 
 
 def signal_handler(signum, frame):
