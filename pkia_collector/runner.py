@@ -47,6 +47,8 @@ class DifyRunner:
             "Content-Type": "application/json"
         }
 
+        storage_url = os.getenv("STORAGE_ADAPTER_URL", "http://127.0.0.1:8000")
+
         # 3. 发送 POST 请求触发 Dify
         url = f"{self.base_url}/workflows/run"
         logger.info(f"🚀 开始将 {len(projects_data)} 个项目推送到 Dify: {url}")
@@ -59,6 +61,44 @@ class DifyRunner:
             result = response.json()
             logger.info(f"✅ 成功触发 Dify 工作流！工作流 ID: {result.get('workflow_run_id')}")
             logger.info(f"工作流最终状态: {result.get('data', {}).get('status')}")
+
+            # 4. 将 Workflow 分析结果写回 Storage Adapter
+            outputs = result.get("data", {}).get("outputs", {})
+            analysis_list = (
+                outputs.get("analysis_results")
+                or outputs.get("output")
+                or outputs.get("result")
+                or []
+            )
+            if isinstance(analysis_list, dict):
+                analysis_list = [analysis_list]
+
+            if not analysis_list:
+                logger.info("Workflow 输出中未发现 analysis_results，跳过回写 Storage Adapter。")
+            else:
+                ok = 0
+                fail = 0
+                for item in analysis_list:
+                    item_project = item.get("project_data") or item.get("project") or {}
+                    item_analysis = item.get("analysis") or item.get("analysis_result") or item
+                    try:
+                        resp = requests.post(
+                            f"{storage_url}/api/v1/projects",
+                            json={
+                                "batch_id": batch_id,
+                                "project_data": item_project,
+                                "analysis": item_analysis,
+                                "pipeline_status": "ANALYZED",
+                            },
+                            timeout=10,
+                        )
+                        resp.raise_for_status()
+                        ok += 1
+                    except requests.RequestException as e:
+                        logger.error(f"回写分析结果失败 (project={item_project.get('project_name', '?')}): {e}")
+                        fail += 1
+
+                logger.info(f"Workflow 分析结果回写完成: 成功 {ok} 项, 失败 {fail} 项")
             
         except requests.RequestException as e:
             logger.error(f"❌ 推送 Dify 失败: {str(e)}")
