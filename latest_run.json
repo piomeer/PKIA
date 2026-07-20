@@ -1,5 +1,20 @@
 [
   {
+    "project_id": "PKIA-GH-bojieli-ai-agent-book",
+    "owner": "bojieli",
+    "project_name": "ai-agent-book",
+    "repo_url": "https://github.com/bojieli/ai-agent-book",
+    "description": "《深入理解 AI Agent：设计原理与工程实践》（李博杰 著）开源主仓库：全书正文、编译版 PDF 与按章配套代码",
+    "language": "Python",
+    "topics": [],
+    "stars": 6704,
+    "forks": 622,
+    "today_stars": 1734,
+    "source": "github_trending",
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.809770+00:00"
+  },
+  {
     "project_id": "PKIA-GH-tirth8205-code-review-graph",
     "owner": "tirth8205",
     "project_name": "code-review-graph",
@@ -7,12 +22,12 @@
     "description": "Local-first code intelligence graph for MCP and CLI. Builds a persistent map of your codebase so AI coding tools read only what matters, with benchmarked context reductions on reviews and large-repo workflows.",
     "language": "Python",
     "topics": [],
-    "stars": 20528,
-    "forks": 2139,
-    "today_stars": 551,
+    "stars": 21558,
+    "forks": 2198,
+    "today_stars": 663,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.538852+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.810114+00:00"
   },
   {
     "project_id": "PKIA-GH-kvcache-ai-ktransformers",
@@ -22,12 +37,12 @@
     "description": "A Flexible Framework for Experiencing Heterogeneous LLM Inference/Fine-tune Optimizations",
     "language": "Python",
     "topics": [],
-    "stars": 18157,
-    "forks": 1434,
-    "today_stars": 328,
+    "stars": 18449,
+    "forks": 1456,
+    "today_stars": 360,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.539153+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.810326+00:00"
   },
   {
     "project_id": "PKIA-GH-rohitg00-ai-engineering-from-scratch",
@@ -37,12 +52,12 @@
     "description": "Learn it. Build it. Ship it for others.",
     "language": "Python",
     "topics": [],
-    "stars": 39373,
-    "forks": 6584,
-    "today_stars": 507,
+    "stars": 39842,
+    "forks": 6641,
+    "today_stars": 501,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.539393+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.810619+00:00"
   },
   {
     "project_id": "PKIA-GH-PostHog-posthog",
@@ -52,12 +67,12 @@
     "description": "🦔 PostHog is the leading platform for building self-driving products. Our developer tools – AI observability, analytics, session replay, flags, experiments, error tracking, logs, and more – capture all the context agents need to diagnose problems, uncover opportunities, and ship fixes. Steer it all from Slack, web, desktop, or the MCP.",
     "language": "Python",
     "topics": [],
-    "stars": 36774,
-    "forks": 3043,
-    "today_stars": 424,
+    "stars": 36986,
+    "forks": 3057,
+    "today_stars": 411,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.539724+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.810914+00:00"
   },
   {
     "project_id": "PKIA-GH-AstrBotDevs-AstrBot",
@@ -67,12 +82,12 @@
     "description": "AI Agent Assistant & development framework that integrates lots of IM platforms, LLMs, plugins and AI feature, and can be your openclaw alternative. ✨",
     "language": "Python",
     "topics": [],
-    "stars": 36589,
-    "forks": 2538,
-    "today_stars": 62,
+    "stars": 36745,
+    "forks": 2550,
+    "today_stars": 83,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.539851+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.811067+00:00"
   },
   {
     "project_id": "PKIA-GH-MoonshotAI-kimi-cli",
@@ -82,12 +97,12 @@
     "description": "Kimi Code CLI is your next CLI agent.",
     "language": "Python",
     "topics": [],
-    "stars": 9679,
-    "forks": 1171,
-    "today_stars": 418,
+    "stars": 9949,
+    "forks": 1198,
+    "today_stars": 410,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.539963+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.811199+00:00"
   },
   {
     "project_id": "PKIA-GH-Canner-WrenAI",
@@ -97,12 +112,12 @@
     "description": "GenBI (Generative BI) for AI agents, an open-source, governed text-to-SQL through an open context layer that turns natural-language questions into trusted dashboards, charts, and SQL across 20+ data sources, such as BigQuery, Snowflake, PostgreSQL, ClickHouse, Amazon Redshift, Databricks and more.",
     "language": "Python",
     "topics": [],
-    "stars": 16050,
-    "forks": 1832,
-    "today_stars": 96,
+    "stars": 16271,
+    "forks": 1845,
+    "today_stars": 121,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.540129+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.811329+00:00"
   },
   {
     "project_id": "PKIA-GH-Q00-ouroboros",
@@ -112,12 +127,12 @@
     "description": "Agent OS: Stop prompting. Start specifying.",
     "language": "Python",
     "topics": [],
-    "stars": 4981,
-    "forks": 497,
-    "today_stars": 29,
+    "stars": 4996,
+    "forks": 501,
+    "today_stars": 17,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.540269+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.811493+00:00"
   },
   {
     "project_id": "PKIA-GH-HKUDS-DeepTutor",
@@ -127,12 +142,12 @@
     "description": "DeepTutor: Lifelong Personalized Tutoring.https://deeptutor.info/.",
     "language": "Python",
     "topics": [],
-    "stars": 27800,
-    "forks": 3692,
-    "today_stars": 370,
+    "stars": 28025,
+    "forks": 3712,
+    "today_stars": 269,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.540410+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.811627+00:00"
   },
   {
     "project_id": "PKIA-GH-Robbyant-lingbot-map",
@@ -142,12 +157,12 @@
     "description": "A feed-forward 3D foundation model for reconstructing scenes from streaming data",
     "language": "Python",
     "topics": [],
-    "stars": 13375,
-    "forks": 1391,
-    "today_stars": 930,
+    "stars": 13686,
+    "forks": 1439,
+    "today_stars": 865,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.540538+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.811749+00:00"
   },
   {
     "project_id": "PKIA-GH-Comfy-Org-ComfyUI",
@@ -157,12 +172,12 @@
     "description": "The most powerful and modular diffusion model GUI, api and backend with a graph/nodes interface.",
     "language": "Python",
     "topics": [],
-    "stars": 121381,
-    "forks": 14287,
-    "today_stars": 139,
+    "stars": 121465,
+    "forks": 14308,
+    "today_stars": 138,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.540717+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.811876+00:00"
   },
   {
     "project_id": "PKIA-GH-FujiwaraChoki-MoneyPrinterV2",
@@ -172,12 +187,12 @@
     "description": "Automate the process of making money online.",
     "language": "Python",
     "topics": [],
-    "stars": 31276,
+    "stars": 31289,
     "forks": 3365,
     "today_stars": 20,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.540859+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.812025+00:00"
   },
   {
     "project_id": "PKIA-GH-topoteretes-cognee",
@@ -187,12 +202,12 @@
     "description": "Cognee is the open-source AI memory platform for agents. Give your AI agents persistent long-term memory across sessions with a self-hosted knowledge graph engine.",
     "language": "Python",
     "topics": [],
-    "stars": 28357,
-    "forks": 2704,
-    "today_stars": 262,
+    "stars": 28521,
+    "forks": 2726,
+    "today_stars": 303,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.540994+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.812177+00:00"
   },
   {
     "project_id": "PKIA-GH-XiaoYouChR-Ghost-Downloader-3",
@@ -202,12 +217,12 @@
     "description": "An AI-boost cross-platform multi-protocol fluent-design concurrent downloader built with Python & Qt.",
     "language": "Python",
     "topics": [],
-    "stars": 6794,
-    "forks": 393,
-    "today_stars": 173,
+    "stars": 6840,
+    "forks": 395,
+    "today_stars": 124,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.541101+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.812302+00:00"
   },
   {
     "project_id": "PKIA-GH-scikit-learn-scikit-learn",
@@ -217,12 +232,12 @@
     "description": "scikit-learn: machine learning in Python",
     "language": "Python",
     "topics": [],
-    "stars": 66721,
-    "forks": 27197,
-    "today_stars": 13,
+    "stars": 66726,
+    "forks": 27198,
+    "today_stars": 9,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.541254+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.812444+00:00"
   },
   {
     "project_id": "PKIA-GH-OWASP-Nettacker",
@@ -232,11 +247,11 @@
     "description": "Automated Penetration Testing Framework - Open-Source Vulnerability Scanner - Vulnerability Management",
     "language": "Python",
     "topics": [],
-    "stars": 5414,
-    "forks": 1132,
-    "today_stars": 18,
+    "stars": 5426,
+    "forks": 1134,
+    "today_stars": 14,
     "source": "github_trending",
-    "batch_id": "BATCH-20260719123302-ed7b",
-    "collection_time": "2026-07-19T12:33:03.541417+00:00"
+    "batch_id": "BATCH-20260720041228-c8cb",
+    "collection_time": "2026-07-20T04:12:30.812593+00:00"
   }
 ]

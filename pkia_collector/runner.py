@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import logging
+from datetime import datetime, timezone
 import requests
 from dotenv import load_dotenv
 from .collector import PKIACollector
@@ -93,12 +94,24 @@ class DifyRunner:
                         logger.warning(f"analysis_data 为空，跳过该项 (project={item_project.get('project_name', '?')}{extra})")
                         fail += 1
                         continue
+                    wf_id = result.get("workflow_run_id", "")
+                    wf_version = os.getenv("PKIA_WORKFLOW_VERSION", "1.0")
+                    now_z = datetime.now(timezone.utc).isoformat() + "Z"
                     analysis_payload = {
                         "batch_id": batch_id,
                         "project_data": item_project,
                         "analysis": item_analysis,
                         "pipeline_status": "ANALYZED",
+                        "pipeline": {
+                            "workflow_id": wf_id,
+                            "workflow_version": wf_version,
+                            "stages": {
+                                "collected_at": item_project.get("collection_time", ""),
+                                "analyzed_at": now_z,
+                            },
+                        },
                     }
+                    logger.info(f"pipeline: workflow_id={wf_id}, version={wf_version}")
                     logger.info(f"即将 POST 到 Storage Adapter，body 前 500 字符: {json.dumps(analysis_payload, ensure_ascii=False)[:500]}")
                     try:
                         resp = requests.post(

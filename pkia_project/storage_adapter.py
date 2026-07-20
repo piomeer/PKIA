@@ -47,15 +47,31 @@ async def receive_project(request: Request):
     analysis_raw = body.get("analysis") or body.get("analysis_result")
     has_analysis = analysis_raw is not None
 
+    now = _now()
     os.makedirs(os.path.dirname(DATA_FILE) or ".", exist_ok=True)
+
+    # Construct pipeline — prefer from request, else build default
+    pipeline = body.get("pipeline", {})
+    if not pipeline:
+        pipeline = {
+            "stages": {
+                "collected_at": project_data.get("collection_time", now),
+            }
+        }
+
     record = {
+        "schema_version": "2.0",
         "batch_id": batch_id,
         "project_data": project_data,
         "pipeline_status": "ANALYZED" if has_analysis else body.get("pipeline_status", "PROMOTED"),
+        "pipeline": pipeline,
+        "metadata": {
+            "created_at": now,
+            "updated_at": now,
+        },
     }
     if has_analysis:
         record["analysis"] = _normalize_analysis(analysis_raw)
-        record["updated_at"] = _now()
 
     with FileLock(LOCK_FILE):
         with open(DATA_FILE, "a", encoding="utf-8") as f:
@@ -104,7 +120,9 @@ async def patch_analysis(project_id: str, request: Request):
                     "confidence": body.get("confidence"),
                 }
                 record["pipeline_status"] = "ANALYZED"
-                record["updated_at"] = _now()
+                record["schema_version"] = "2.0"
+                record["metadata"] = record.get("metadata", {"created_at": _now()})
+                record["metadata"]["updated_at"] = _now()
                 found = True
 
             updated_lines.append(json.dumps(record, ensure_ascii=False) + "\n")
